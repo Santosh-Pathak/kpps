@@ -1,11 +1,12 @@
 import type { Metadata } from 'next'
 import { HomeHero } from '@/components/public/home/HomeHero'
 import { StatsStrip } from '@/components/public/home/StatsStrip'
+import { PrincipalMessage } from '@/components/public/home/PrincipalMessage'
 import { WhyChooseUs } from '@/components/public/home/WhyChooseUs'
 import { CurriculumSnapshot } from '@/components/public/home/CurriculumSnapshot'
 import { FacilitiesPreview } from '@/components/public/home/FacilitiesPreview'
+import { ActivitiesGallery } from '@/components/public/home/ActivitiesGallery'
 import { AchievementsSection } from '@/components/public/home/AchievementsSection'
-import { NewsNotices } from '@/components/public/home/NewsNotices'
 import { TestimonialsSection } from '@/components/public/home/TestimonialsSection'
 import { AdmissionCTA } from '@/components/public/home/AdmissionCTA'
 
@@ -20,11 +21,12 @@ export default function HomePage() {
       <>
          <HomeHero />
          <StatsStrip />
+         <PrincipalMessage />
          <WhyChooseUs />
          <CurriculumSnapshot />
          <FacilitiesPreview />
+         <ActivitiesGallery />
          <AchievementsSection />
-         <NewsNotices />
          <TestimonialsSection />
          <AdmissionCTA />
       </>

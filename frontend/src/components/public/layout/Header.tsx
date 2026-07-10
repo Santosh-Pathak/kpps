@@ -1,11 +1,14 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
-import { Menu, Sun, Moon, Phone, Mail, GraduationCap } from 'lucide-react'
+import { motion, useScroll, useTransform, AnimatePresence } from 'framer-motion'
+// AnimatePresence kept for theme toggle animation below
+import { Sun, Moon, Phone, Mail, ChevronDown } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { cn } from '@/lib/utils'
+import { Logo } from '@/components/public/shared/Logo'
 import { MobileNav } from './MobileNav'
+import { schoolInfo } from '@/lib/dummy-data'
 
 const navItems = [
    {
@@ -38,27 +41,37 @@ const navItems = [
          { label: 'Videos', href: '/gallery#videos' },
       ],
    },
-   { label: 'Downloads', href: '/downloads' },
    { label: 'Contact', href: '/contact' },
 ]
 
 export function Header() {
-   const [scrolled, setScrolled] = useState(false)
    const [mobileOpen, setMobileOpen] = useState(false)
    const [dark, setDark] = useState(false)
    const [mounted, setMounted] = useState(false)
+   const [utilityVisible, setUtilityVisible] = useState(true)
+   const lastYRef = useRef(0)
+
+   const { scrollY } = useScroll()
+   const navBg = useTransform(scrollY, [0, 80], ['rgba(255,255,255,0)', 'rgba(255,255,255,1)'])
+   const navShadow = useTransform(
+      scrollY,
+      [60, 100],
+      ['0 0 0 0 rgba(0,0,0,0)', '0 2px 16px 0 rgba(15,81,50,0.10)']
+   )
 
    useEffect(() => {
       setMounted(true)
       const stored = localStorage.getItem('kpps-theme')
-      const prefersDark = window.matchMedia(
-         '(prefers-color-scheme: dark)'
-      ).matches
+      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches
       const isDark = stored === 'dark' || (!stored && prefersDark)
       document.documentElement.classList.toggle('dark', isDark)
       setDark(isDark)
 
-      const onScroll = () => setScrolled(window.scrollY > 10)
+      const onScroll = () => {
+         const y = window.scrollY
+         setUtilityVisible(y < lastYRef.current || y < 40)
+         lastYRef.current = y
+      }
       window.addEventListener('scroll', onScroll, { passive: true })
       return () => window.removeEventListener('scroll', onScroll)
    }, [])
@@ -72,97 +85,73 @@ export function Header() {
 
    return (
       <>
-         {/* Top utility bar */}
-         <div className="bg-navy hidden text-xs text-white md:block">
+         {/* Top utility bar — desktop only, fades out on scroll down (no height change = no layout shift) */}
+         <div
+            className="hidden bg-[#0F5132] text-xs text-white transition-opacity duration-200 md:block"
+            style={{ opacity: utilityVisible ? 1 : 0, pointerEvents: utilityVisible ? 'auto' : 'none' }}
+         >
             <div className="container-kpps flex items-center justify-between py-1.5">
                <div className="flex items-center gap-4">
                   <a
-                     href="tel:+910000000000"
-                     className="hover:text-secondary flex items-center gap-1 transition-colors"
+                     href={`tel:${schoolInfo.phone.replace(/\s/g, '')}`}
+                     className="flex items-center gap-1 transition-colors hover:text-[#22C55E]"
                   >
                      <Phone className="h-3 w-3" />
-                     +91 00000 00000
+                     {schoolInfo.phone}
                   </a>
                   <a
-                     href="mailto:info@kpps.edu.in"
-                     className="hover:text-secondary flex items-center gap-1 transition-colors"
+                     href={`mailto:${schoolInfo.email}`}
+                     className="flex items-center gap-1 transition-colors hover:text-[#22C55E]"
                   >
                      <Mail className="h-3 w-3" />
-                     info@kpps.edu.in
+                     {schoolInfo.email}
                   </a>
                </div>
                <div className="flex items-center gap-3">
-                  <span className="text-secondary font-semibold">
-                     Admissions Open 2025–26
+                  <span className="font-semibold text-[#D1FAE5]">
+                     Admissions Open {schoolInfo.admissionsYear}
                   </span>
                   <Link href="/admissions">
-                     <Button
-                        variant="cta"
-                        size="sm"
-                        className="h-6 px-3 text-xs"
-                     >
+                     <button className="rounded-full bg-[#22C55E] px-3 py-0.5 text-[10px] font-bold text-white transition-colors hover:bg-[#16a34a]">
                         Apply Now
-                     </Button>
+                     </button>
                   </Link>
                </div>
             </div>
          </div>
 
-         {/* Main header */}
-         <header
-            className={cn(
-               'sticky top-0 z-50 w-full transition-all duration-300',
-               scrolled
-                  ? 'bg-background/95 shadow-md backdrop-blur-md'
-                  : 'bg-background'
-            )}
+         {/* Main header — starts transparent (hero overlap), transitions to solid on scroll */}
+         <motion.header
+            className="sticky top-0 z-50 w-full bg-white/0 dark:bg-[#0A1F16]/0"
+            style={{
+               backgroundColor: navBg,
+               boxShadow: navShadow,
+               backdropFilter: 'blur(12px)',
+            }}
          >
             <div className="container-kpps flex h-16 items-center justify-between md:h-20">
-               {/* Logo */}
-               <Link href="/" className="flex shrink-0 items-center gap-3">
-                  <div className="bg-navy flex h-10 w-10 items-center justify-center rounded-full md:h-12 md:w-12">
-                     <GraduationCap className="text-secondary h-6 w-6 md:h-7 md:w-7" />
-                  </div>
-                  <div className="hidden sm:block">
-                     <p className="font-heading text-navy dark:text-secondary text-base leading-tight font-bold md:text-lg">
-                        Kids Paradise
-                     </p>
-                     <p className="text-muted-foreground text-xs leading-tight">
-                        Sr. Sec. School
-                     </p>
-                  </div>
-               </Link>
+               <Logo size="md" />
 
                {/* Desktop nav */}
-               <nav className="hidden items-center gap-1 xl:flex">
+               <nav className="hidden items-center gap-0.5 xl:flex" aria-label="Main navigation">
                   {navItems.map((item) =>
                      item.children ? (
                         <div key={item.label} className="group relative">
                            <Link
                               href={item.href}
-                              className="hover:bg-muted flex items-center gap-1 rounded-md px-3 py-2 text-sm font-medium transition-colors"
+                              className="flex items-center gap-0.5 rounded-lg px-3 py-2 text-sm font-medium text-[#0B1F17] transition-colors hover:bg-[#D1FAE5] hover:text-[#0F5132] dark:text-[#F0FBF6] dark:hover:bg-[#0F3D2E] dark:hover:text-[#22C55E]"
                            >
                               {item.label}
-                              <svg
-                                 className="h-3 w-3 opacity-60"
-                                 fill="none"
-                                 viewBox="0 0 24 24"
-                                 stroke="currentColor"
-                              >
-                                 <path
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    strokeWidth={2}
-                                    d="M19 9l-7 7-7-7"
-                                 />
-                              </svg>
+                              <ChevronDown className="h-3 w-3 opacity-60 transition-transform group-hover:rotate-180" />
                            </Link>
-                           <div className="bg-popover border-border invisible absolute top-full left-0 z-50 mt-1 w-52 rounded-lg border opacity-0 shadow-lg transition-all duration-150 group-hover:visible group-hover:opacity-100">
+                           {/* Animated underline */}
+                           <span className="absolute bottom-0.5 left-3 right-3 h-px origin-left scale-x-0 bg-[#22C55E] transition-transform duration-200 group-hover:scale-x-100" />
+                           <div className="invisible absolute top-full left-0 z-50 mt-1 w-52 rounded-xl border border-[#E3F0E9] bg-white opacity-0 shadow-lg transition-all duration-150 group-hover:visible group-hover:opacity-100 dark:border-[#1C4632] dark:bg-[#0F2A1E]">
                               {item.children.map((child) => (
                                  <Link
                                     key={child.label}
                                     href={child.href}
-                                    className="hover:bg-muted block px-4 py-2.5 text-sm transition-colors first:rounded-t-lg last:rounded-b-lg"
+                                    className="block px-4 py-2.5 text-sm text-[#0B1F17] transition-colors first:rounded-t-xl last:rounded-b-xl hover:bg-[#F6FBF8] hover:text-[#0F5132] dark:text-[#F0FBF6] dark:hover:bg-[#0F3D2E] dark:hover:text-[#22C55E]"
                                  >
                                     {child.label}
                                  </Link>
@@ -173,7 +162,7 @@ export function Header() {
                         <Link
                            key={item.label}
                            href={item.href}
-                           className="hover:bg-muted rounded-md px-3 py-2 text-sm font-medium transition-colors"
+                           className="relative rounded-lg px-3 py-2 text-sm font-medium text-[#0B1F17] transition-colors hover:bg-[#D1FAE5] hover:text-[#0F5132] dark:text-[#F0FBF6] dark:hover:bg-[#0F3D2E] dark:hover:text-[#22C55E]"
                         >
                            {item.label}
                         </Link>
@@ -185,81 +174,70 @@ export function Header() {
                <div className="flex items-center gap-2">
                   {/* Theme toggle */}
                   {mounted && (
-                     <button
+                     <motion.button
                         onClick={toggleTheme}
-                        className="hover:bg-muted rounded-md p-2 transition-colors"
+                        className="rounded-lg p-2 text-[#0B1F17] transition-colors hover:bg-[#D1FAE5] dark:text-[#F0FBF6] dark:hover:bg-[#0F3D2E]"
                         aria-label="Toggle theme"
+                        whileTap={{ scale: 0.9 }}
                      >
-                        {dark ? (
-                           <Sun className="h-5 w-5" />
-                        ) : (
-                           <Moon className="h-5 w-5" />
-                        )}
-                     </button>
+                        <AnimatePresence mode="wait" initial={false}>
+                           <motion.span
+                              key={dark ? 'sun' : 'moon'}
+                              initial={{ rotate: -90, opacity: 0 }}
+                              animate={{ rotate: 0, opacity: 1 }}
+                              exit={{ rotate: 90, opacity: 0 }}
+                              transition={{ duration: 0.2 }}
+                              className="block"
+                           >
+                              {dark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+                           </motion.span>
+                        </AnimatePresence>
+                     </motion.button>
                   )}
 
-                  {/* Apply Now (desktop) */}
+                  {/* Apply Now CTA */}
                   <Link href="/admissions" className="hidden lg:block">
-                     <Button variant="cta" size="sm">
+                     <Button
+                        variant="cta"
+                        size="sm"
+                        className="rounded-full px-5 text-xs font-bold tracking-wide"
+                     >
                         Apply Now
                      </Button>
                   </Link>
 
-                  {/* Admin link */}
-                  <Link href="/admin" className="hidden lg:block">
-                     <button
-                        className="hover:bg-muted rounded-md p-2 opacity-50 transition-colors hover:opacity-100"
-                        aria-label="Admin"
-                     >
-                        <svg
-                           className="h-4 w-4"
-                           fill="none"
-                           viewBox="0 0 24 24"
-                           stroke="currentColor"
-                        >
-                           <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth={2}
-                              d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
-                           />
-                        </svg>
-                     </button>
-                  </Link>
-
                   {/* Mobile hamburger */}
-                  <button
-                     className="hover:bg-muted rounded-md p-2 transition-colors xl:hidden"
+                  <motion.button
+                     className="rounded-lg p-2 text-[#0B1F17] transition-colors hover:bg-[#D1FAE5] dark:text-[#F0FBF6] dark:hover:bg-[#0F3D2E] xl:hidden"
                      onClick={() => setMobileOpen(true)}
                      aria-label="Open menu"
+                     whileTap={{ scale: 0.9 }}
                   >
-                     <Menu className="h-5 w-5" />
-                  </button>
+                     <div className="flex h-5 w-5 flex-col justify-between">
+                        <span className="block h-0.5 w-full rounded bg-current" />
+                        <span className="block h-0.5 w-4/5 rounded bg-current" />
+                        <span className="block h-0.5 w-full rounded bg-current" />
+                     </div>
+                  </motion.button>
                </div>
             </div>
-         </header>
+         </motion.header>
 
-         {/* Mobile Nav */}
-         <MobileNav
-            items={navItems}
-            open={mobileOpen}
-            onClose={() => setMobileOpen(false)}
-         />
+         <MobileNav items={navItems} open={mobileOpen} onClose={() => setMobileOpen(false)} />
 
-         {/* Mobile sticky CTA bar */}
-         <div className="bg-navy border-navy-700 fixed right-0 bottom-0 left-0 z-40 flex border-t xl:hidden">
+         {/* Mobile sticky bottom CTA bar */}
+         <div className="fixed right-0 bottom-0 left-0 z-40 flex border-t border-[#E3F0E9] bg-white xl:hidden dark:border-[#1C4632] dark:bg-[#0A1F16]">
             <a
-               href="tel:+910000000000"
-               className="border-navy-700 flex flex-1 items-center justify-center gap-2 border-r py-3 text-sm font-semibold text-white"
+               href={`tel:${schoolInfo.phone.replace(/\s/g, '')}`}
+               className="flex flex-1 items-center justify-center gap-2 border-r border-[#E3F0E9] py-3.5 text-sm font-semibold text-[#0B1F17] dark:border-[#1C4632] dark:text-[#F0FBF6]"
             >
-               <Phone className="h-4 w-4" />
+               <Phone className="h-4 w-4 text-[#0F5132] dark:text-[#22C55E]" />
                Call Now
             </a>
             <Link
                href="/admissions"
-               className="bg-accent flex flex-1 items-center justify-center gap-2 py-3 text-sm font-semibold text-white"
+               className="flex flex-1 items-center justify-center gap-2 bg-[#0F5132] py-3.5 text-sm font-semibold text-white"
             >
-               <GraduationCap className="h-4 w-4" />
                Apply Now
             </Link>
          </div>

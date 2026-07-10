@@ -394,78 +394,119 @@
   background-color: var(--interactive-secondary-hover);
 }
 
-/* ─── Kids Paradise school public brand ─── */
+/* ─── Kids Paradise school public brand — Green/White system ─── */
 @theme inline {
-  --color-navy: #1e3a5f;
-  --color-navy-600: #1e3a5f;
-  --color-navy-700: #1a3356;
-  --color-navy-800: #152a47;
-  --color-navy-900: #0f1f35;
-  --color-gold: #f59e0b;
-  --color-gold-500: #f59e0b;
-  --color-coral: #e05a2b;
-  --font-heading: var(--font-baloo), 'Baloo 2', 'Poppins', sans-serif;
-  --font-body: var(--font-inter), 'Inter', sans-serif;
+  /* Brand color tokens */
+  --color-kpps-primary: #0F5132;
+  --color-kpps-primary-dark: #0B3D26;
+  --color-kpps-accent: #22C55E;
+  --color-kpps-accent-soft: #D1FAE5;
+  --color-kpps-bg: #FFFFFF;
+  --color-kpps-bg-alt: #F6FBF8;
+  --color-kpps-text: #0B1F17;
+  --color-kpps-text-muted: #4B6358;
+  --color-kpps-border: #E3F0E9;
+  /* Dark mode brand tokens */
+  --color-kpps-dark-primary: #22C55E;
+  --color-kpps-dark-primary-dark: #166534;
+  --color-kpps-dark-accent: #4ADE80;
+  --color-kpps-dark-accent-soft: #0F3D2E;
+  --color-kpps-dark-bg: #0A1F16;
+  --color-kpps-dark-bg-alt: #0F2A1E;
+  --color-kpps-dark-text: #F0FBF6;
+  --color-kpps-dark-text-muted: #9CC7B3;
+  --color-kpps-dark-border: #1C4632;
+  /* Font stacks */
+  --font-display: var(--font-fraunces), 'Georgia', serif;
+  --font-body: var(--font-plus-jakarta), 'system-ui', sans-serif;
 }
 
 .school-public {
-  --background: #faf8f5;
-  --foreground: #1a2332;
-  --card: #ffffff;
-  --card-foreground: #1a2332;
-  --popover: #ffffff;
-  --popover-foreground: #1a2332;
-  --primary: #1e3a5f;
-  --primary-foreground: #ffffff;
-  --secondary: #f59e0b;
-  --secondary-foreground: #1a2332;
-  --muted: #f0ebe3;
-  --muted-foreground: #64748b;
-  --accent: #e05a2b;
-  --accent-foreground: #ffffff;
+  /* Map brand tokens to shadcn legacy vars */
+  --background: #FFFFFF;
+  --foreground: #0B1F17;
+  --card: #FFFFFF;
+  --card-foreground: #0B1F17;
+  --popover: #FFFFFF;
+  --popover-foreground: #0B1F17;
+  --primary: #0F5132;
+  --primary-foreground: #FFFFFF;
+  --secondary: #F6FBF8;
+  --secondary-foreground: #0B1F17;
+  --muted: #F6FBF8;
+  --muted-foreground: #4B6358;
+  --accent: #22C55E;
+  --accent-foreground: #FFFFFF;
   --destructive: #ef4444;
   --destructive-foreground: #fafafa;
-  --border: #d4dce8;
-  --input: #d4dce8;
-  --ring: #1e3a5f;
+  --border: #E3F0E9;
+  --input: #E3F0E9;
+  --ring: #22C55E;
   --radius: 0.5rem;
-  --bg-primary: #faf8f5;
-  --fg-primary: #1a2332;
+  --bg-primary: #FFFFFF;
+  --fg-primary: #0B1F17;
+  /* Named brand vars for direct use in components */
+  --sp-primary: #0F5132;
+  --sp-primary-dark: #0B3D26;
+  --sp-accent: #22C55E;
+  --sp-accent-soft: #D1FAE5;
+  --sp-bg: #FFFFFF;
+  --sp-bg-alt: #F6FBF8;
+  --sp-text: #0B1F17;
+  --sp-text-muted: #4B6358;
+  --sp-border: #E3F0E9;
   color: var(--foreground);
   background: var(--background);
 }
 
 .dark .school-public,
 html.dark .school-public {
-  --background: #121a24;
-  --foreground: #f5f0e8;
-  --card: #1a2332;
-  --card-foreground: #f5f0e8;
-  --popover: #1a2332;
-  --popover-foreground: #f5f0e8;
-  --primary: #f59e0b;
-  --primary-foreground: #1a2332;
-  --secondary: #2d5a9e;
-  --secondary-foreground: #ffffff;
-  --muted: #1e293b;
-  --muted-foreground: #94a3b8;
-  --accent: #e8734a;
-  --accent-foreground: #ffffff;
-  --border: #2a3544;
-  --input: #2a3544;
-  --ring: #f59e0b;
-  --bg-primary: #121a24;
-  --fg-primary: #f5f0e8;
+  --background: #0A1F16;
+  --foreground: #F0FBF6;
+  --card: #0F2A1E;
+  --card-foreground: #F0FBF6;
+  --popover: #0F2A1E;
+  --popover-foreground: #F0FBF6;
+  --primary: #22C55E;
+  --primary-foreground: #0A1F16;
+  --secondary: #0F2A1E;
+  --secondary-foreground: #F0FBF6;
+  --muted: #0F2A1E;
+  --muted-foreground: #9CC7B3;
+  --accent: #4ADE80;
+  --accent-foreground: #0A1F16;
+  --destructive: #ef4444;
+  --destructive-foreground: #fafafa;
+  --border: #1C4632;
+  --input: #1C4632;
+  --ring: #4ADE80;
+  --bg-primary: #0A1F16;
+  --fg-primary: #F0FBF6;
+  --sp-primary: #22C55E;
+  --sp-primary-dark: #166534;
+  --sp-accent: #4ADE80;
+  --sp-accent-soft: #0F3D2E;
+  --sp-bg: #0A1F16;
+  --sp-bg-alt: #0F2A1E;
+  --sp-text: #F0FBF6;
+  --sp-text-muted: #9CC7B3;
+  --sp-border: #1C4632;
 }
 
-.school-public .font-heading,
-.font-heading {
-  font-family: var(--font-baloo), 'Baloo 2', 'Poppins', sans-serif;
+.school-public .font-display,
+.font-display {
+  font-family: var(--font-display);
 }
 
 .school-public .font-body,
 .font-body {
-  font-family: var(--font-inter), 'Inter', sans-serif;
+  font-family: var(--font-body);
+}
+
+/* Preserve .font-heading alias for older components */
+.school-public .font-heading,
+.font-heading {
+  font-family: var(--font-display);
 }
 
 .section-pad {
@@ -476,6 +517,49 @@ html.dark .school-public {
   @apply container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8;
 }
 
-.gradient-text {
-  @apply bg-gradient-to-r from-navy to-gold bg-clip-text text-transparent;
+/* Type scale utilities */
+.kpps-h1 {
+  font-family: var(--font-display);
+  font-size: clamp(2.25rem, 5vw, 4rem);
+  font-weight: 700;
+  line-height: 1.1;
 }
+
+.kpps-h2 {
+  font-family: var(--font-display);
+  font-size: clamp(1.75rem, 3vw, 2.5rem);
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.kpps-eyebrow {
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--sp-accent);
+}
+
+/* prefers-reduced-motion helper — used in Framer configs */
+@media (prefers-reduced-motion: reduce) {
+  .motion-safe-only {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
+.gradient-text {
+  background: linear-gradient(135deg, var(--sp-primary), var(--sp-accent));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+@keyframes kenBurns {
+  0%   { transform: scale(1) translateX(0) translateY(0); }
+  100% { transform: scale(1.08) translateX(-1%) translateY(-1%); }
+}
+
+/* Hide scrollbar for horizontal scroll containers */
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }

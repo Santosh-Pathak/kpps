@@ -7,7 +7,7 @@ const HeroSlider = dynamic(
       import('@/components/public/home/HeroSlider').then((m) => m.HeroSlider),
    {
       loading: () => (
-         <div className="from-navy h-[92vh] max-h-[900px] min-h-[520px] animate-pulse bg-gradient-to-br to-[#2d5a9e]" />
+         <div className="h-[90vh] min-h-[520px] animate-pulse bg-gradient-to-br from-[#0B3D26] to-[#0F5132]" />
       ),
       ssr: false,
    }

@@ -3,100 +3,67 @@
 import Link from 'next/link'
 import { motion } from 'framer-motion'
 import { ArrowRight } from 'lucide-react'
-
-const stages = [
-   {
-      range: 'Pre-Primary',
-      grades: 'Nursery – KG',
-      description:
-         'Play-based learning, phonics, number sense, and foundational life skills.',
-      color: 'bg-amber-100 dark:bg-amber-950 border-amber-300 dark:border-amber-800',
-   },
-   {
-      range: 'Primary',
-      grades: 'Class I – V',
-      description:
-         'Strong foundations in Languages, Maths, EVS with activity-based teaching.',
-      color: 'bg-sky-100 dark:bg-sky-950 border-sky-300 dark:border-sky-800',
-   },
-   {
-      range: 'Middle School',
-      grades: 'Class VI – VIII',
-      description:
-         'Broadened curriculum with Science, Social Science, and project-based learning.',
-      color: 'bg-green-100 dark:bg-green-950 border-green-300 dark:border-green-800',
-   },
-   {
-      range: 'Secondary',
-      grades: 'Class IX – X',
-      description:
-         'CBSE Board preparation with comprehensive coaching and regular assessment.',
-      color: 'bg-violet-100 dark:bg-violet-950 border-violet-300 dark:border-violet-800',
-   },
-   {
-      range: 'Senior Secondary',
-      grades: 'Class XI – XII',
-      description:
-         'Science (Med/Non-Med), Commerce & Arts/Humanities streams with career guidance.',
-      color: 'bg-rose-100 dark:bg-rose-950 border-rose-300 dark:border-rose-800',
-   },
-]
+import { curriculumStages } from '@/lib/dummy-data'
+import { WaveDivider } from '@/components/public/shared/WaveDivider'
 
 export function CurriculumSnapshot() {
    return (
-      <section className="section-pad bg-muted/40">
+      <section className="relative bg-[#F6FBF8] pb-0 pt-16 dark:bg-[#0F2A1E] md:pt-24">
          <div className="container-kpps">
             <motion.div
                initial={{ opacity: 0, y: 20 }}
                whileInView={{ opacity: 1, y: 0 }}
                viewport={{ once: true }}
+               transition={{ duration: 0.5 }}
                className="mb-12 text-center"
             >
-               <p className="text-secondary mb-2 text-sm font-semibold tracking-widest uppercase">
-                  Curriculum
-               </p>
-               <h2 className="font-heading mb-3 text-3xl font-bold md:text-4xl">
+               <p className="kpps-eyebrow mb-3">Curriculum</p>
+               <h2 className="kpps-h2 font-display mb-3 text-[#0B1F17] dark:text-[#F0FBF6]">
                   Academics at a Glance
                </h2>
-               <p className="text-muted-foreground mx-auto max-w-xl">
-                  From Nursery to Class XII — a seamless journey of learning and
-                  growth.
+               <p className="mx-auto max-w-xl text-[#4B6358] dark:text-[#9CC7B3]">
+                  From Nursery to Class XII — a seamless journey of learning and growth.
                </p>
             </motion.div>
 
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-5">
-               {stages.map((stage, i) => (
+            {/* Horizontal scroll on mobile, grid on desktop */}
+            <div className="no-scrollbar -mx-4 flex snap-x snap-mandatory gap-4 overflow-x-auto px-4 pb-2 lg:mx-0 lg:grid lg:grid-cols-5 lg:overflow-visible lg:px-0 lg:pb-0">
+               {curriculumStages.map((stage, i) => (
                   <motion.div
                      key={stage.range}
                      initial={{ opacity: 0, scale: 0.95 }}
                      whileInView={{ opacity: 1, scale: 1 }}
                      viewport={{ once: true }}
                      transition={{ delay: i * 0.08 }}
-                     className={`rounded-xl border p-5 ${stage.color}`}
+                     whileHover={{ y: -4 }}
+                     className="group flex min-w-[220px] snap-start flex-col rounded-2xl border border-[#E3F0E9] bg-white p-6 transition-shadow hover:shadow-lg dark:border-[#1C4632] dark:bg-[#0A1F16] lg:min-w-0"
                   >
-                     <p className="font-heading mb-0.5 text-base font-bold">
+                     <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-xl bg-[#D1FAE5] transition-colors group-hover:bg-[#22C55E] dark:bg-[#0F3D2E]">
+                        <stage.icon className="h-5 w-5 text-[#0F5132] transition-colors group-hover:text-white dark:text-[#22C55E]" />
+                     </div>
+                     <p className="font-display mb-0.5 text-base font-bold text-[#0B1F17] dark:text-[#F0FBF6]">
                         {stage.range}
                      </p>
-                     <p className="text-muted-foreground mb-2 text-xs font-semibold">
-                        {stage.grades}
-                     </p>
-                     <p className="text-muted-foreground text-xs leading-relaxed">
+                     <p className="mb-2 text-xs font-semibold text-[#22C55E]">{stage.grades}</p>
+                     <p className="flex-1 text-xs leading-relaxed text-[#4B6358] dark:text-[#9CC7B3]">
                         {stage.description}
                      </p>
+                     <Link
+                        href="/academics"
+                        className="mt-4 inline-flex items-center gap-1 text-xs font-semibold text-[#0F5132] transition-all group-hover:gap-2 dark:text-[#22C55E]"
+                     >
+                        Explore <ArrowRight className="h-3 w-3" />
+                     </Link>
                   </motion.div>
                ))}
             </div>
-
-            <div className="mt-8 text-center">
-               <Link
-                  href="/academics"
-                  className="text-primary inline-flex items-center gap-2 font-semibold hover:underline"
-               >
-                  View Full Curriculum
-                  <ArrowRight className="h-4 w-4" />
-               </Link>
-            </div>
          </div>
+
+         <WaveDivider
+            className="mt-16"
+            fromColor="fill-[#F6FBF8] dark:fill-[#0F2A1E]"
+            toColor="fill-[#FFFFFF] dark:fill-[#0A1F16]"
+         />
       </section>
    )
 }
