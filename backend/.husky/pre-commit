@@ -1,0 +1,7 @@
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
+
+ROOT="$(cd "$(dirname -- "$0")/../.." && pwd)"
+
+cd "$ROOT/backend" && npx lint-staged
+cd "$ROOT/frontend" && npx lint-staged
