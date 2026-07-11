@@ -1,14 +1,11 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import {
-   FileText,
-   UserCheck,
-   BookOpen,
-   CheckCircle,
-   Download,
-} from 'lucide-react'
+import { FileText, UserCheck, BookOpen, CheckCircle, Download } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { SectionHeading } from '@/components/public/shared/SectionHeading'
+import { useReducedMotion } from '@/hooks/useReducedMotion'
+import { cn } from '@/lib/utils'
 
 const steps = [
    {
@@ -42,11 +39,7 @@ const eligibility = [
    ['LKG', '4 years as of 31st March', 'Birth Certificate'],
    ['UKG', '5 years as of 31st March', 'Birth Certificate'],
    ['Class I', '6 years as of 31st March', 'Birth Certificate + UKG TC'],
-   [
-      'Class II – VIII',
-      'Age appropriate',
-      'TC from previous school + Mark Sheet',
-   ],
+   ['Class II – VIII', 'Age appropriate', 'TC from previous school + Mark Sheet'],
    ['Class IX', 'Passed Class VIII', 'TC + Class VIII Marksheet'],
    ['Class X', 'Passed Class IX', 'TC + Class IX Marksheet'],
    ['Class XI', 'Passed Class X', 'TC + Class X Board Marksheet'],
@@ -64,96 +57,80 @@ const documents = [
 ]
 
 export function AdmissionsContent() {
+   const reduced = useReducedMotion()
+
    return (
-      <section className="section-pad">
+      <section className="section-pad bg-[var(--sp-bg)]">
          <div className="container-kpps space-y-16">
-            {/* Process */}
+
+            {/* ── 4-Step Process ─────────────────────────────────────── */}
             <div>
-               <motion.div
-                  initial={{ opacity: 0, y: 16 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
+               <SectionHeading
+                  eyebrow="Process"
+                  title="4-Step Admission Process"
+                  align="left"
                   className="mb-8"
-               >
-                  <p className="text-secondary mb-1 text-sm font-semibold tracking-widest uppercase">
-                     Process
-                  </p>
-                  <h2 className="font-heading text-2xl font-bold md:text-3xl">
-                     4-Step Admission Process
-                  </h2>
-               </motion.div>
+               />
+
+               {/* 4 steps: stagger kept because this IS a genuine ordered sequence */}
                <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
                   {steps.map((s, i) => (
                      <motion.div
                         key={s.num}
-                        initial={{ opacity: 0, y: 16 }}
+                        initial={reduced ? false : { opacity: 0, y: 16 }}
                         whileInView={{ opacity: 1, y: 0 }}
                         viewport={{ once: true }}
-                        transition={{ delay: i * 0.1 }}
-                        className="bg-muted/50 relative rounded-xl p-6 text-center"
+                        transition={
+                           reduced ? { duration: 0 } : { duration: 0.45, delay: i * 0.07, ease: 'easeOut' }
+                        }
+                        className={cn(
+                           'relative rounded-lg border border-[var(--sp-border)] bg-[var(--sp-bg-alt)] p-6 text-center',
+                           'shadow-[var(--shadow-card,0_2px_16px_rgba(15,81,50,0.06))]'
+                        )}
                      >
-                        <div className="bg-secondary text-navy absolute -top-3 left-1/2 flex h-7 w-7 -translate-x-1/2 items-center justify-center rounded-full text-xs font-bold">
+                        {/* Step number badge */}
+                        <div className="absolute -top-3.5 left-1/2 flex h-7 w-7 -translate-x-1/2 items-center justify-center rounded-full bg-[var(--sp-accent)] text-xs font-bold text-white">
                            {s.num}
                         </div>
-                        <div className="bg-navy/10 dark:bg-secondary/20 mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-xl">
-                           <s.icon className="text-navy dark:text-secondary h-6 w-6" />
+                        <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-md bg-[var(--sp-accent-soft)]">
+                           <s.icon className="h-6 w-6 text-[var(--sp-primary)]" aria-hidden="true" />
                         </div>
-                        <h3 className="font-heading mb-1 text-sm font-semibold">
+                        <h3 className="font-display mb-1 text-sm font-semibold text-[var(--sp-text)]">
                            {s.title}
                         </h3>
-                        <p className="text-muted-foreground text-xs">
-                           {s.desc}
-                        </p>
+                        <p className="text-xs leading-relaxed text-[var(--sp-text-muted)]">{s.desc}</p>
                      </motion.div>
                   ))}
                </div>
             </div>
 
-            {/* Eligibility */}
+            {/* ── Eligibility Table ──────────────────────────────────── */}
             <div>
-               <motion.div
-                  initial={{ opacity: 0, y: 16 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
+               <SectionHeading
+                  eyebrow="Eligibility"
+                  title="Age & Class Criteria"
+                  align="left"
                   className="mb-6"
-               >
-                  <p className="text-secondary mb-1 text-sm font-semibold tracking-widest uppercase">
-                     Eligibility
-                  </p>
-                  <h2 className="font-heading text-2xl font-bold md:text-3xl">
-                     Age & Class Criteria
-                  </h2>
-               </motion.div>
-               <div className="border-border overflow-x-auto rounded-xl border">
+               />
+
+               <div className="overflow-x-auto rounded-lg border border-[var(--sp-border)]">
                   <table className="w-full text-sm">
-                     <thead className="bg-navy text-white">
+                     <thead className="bg-[var(--sp-primary)] text-white">
                         <tr>
-                           <th className="px-4 py-3 text-left font-semibold">
-                              Class
-                           </th>
-                           <th className="px-4 py-3 text-left font-semibold">
-                              Age Criteria
-                           </th>
-                           <th className="px-4 py-3 text-left font-semibold">
-                              Documents Required
-                           </th>
+                           <th className="px-4 py-3 text-left font-semibold">Class</th>
+                           <th className="px-4 py-3 text-left font-semibold">Age Criteria</th>
+                           <th className="px-4 py-3 text-left font-semibold">Documents Required</th>
                         </tr>
                      </thead>
                      <tbody>
                         {eligibility.map(([cls, age, docs], i) => (
                            <tr
                               key={cls}
-                              className={
-                                 i % 2 === 0 ? 'bg-background' : 'bg-muted/30'
-                              }
+                              className={i % 2 === 0 ? 'bg-[var(--sp-bg)]' : 'bg-[var(--sp-bg-alt)]'}
                            >
-                              <td className="px-4 py-3 font-medium">{cls}</td>
-                              <td className="text-muted-foreground px-4 py-3">
-                                 {age}
-                              </td>
-                              <td className="text-muted-foreground px-4 py-3">
-                                 {docs}
-                              </td>
+                              <td className="px-4 py-3 font-medium text-[var(--sp-text)]">{cls}</td>
+                              <td className="px-4 py-3 text-[var(--sp-text-muted)]">{age}</td>
+                              <td className="px-4 py-3 text-[var(--sp-text-muted)]">{docs}</td>
                            </tr>
                         ))}
                      </tbody>
@@ -161,29 +138,22 @@ export function AdmissionsContent() {
                </div>
             </div>
 
-            {/* Documents + Download */}
+            {/* ── Documents + Download ───────────────────────────────── */}
             <div className="grid gap-10 md:grid-cols-2">
                <div>
-                  <motion.div
-                     initial={{ opacity: 0, y: 16 }}
-                     whileInView={{ opacity: 1, y: 0 }}
-                     viewport={{ once: true }}
+                  <SectionHeading
+                     eyebrow="Checklist"
+                     title="Required Documents"
+                     align="left"
                      className="mb-6"
-                  >
-                     <p className="text-secondary mb-1 text-sm font-semibold tracking-widest uppercase">
-                        Checklist
-                     </p>
-                     <h2 className="font-heading text-2xl font-bold">
-                        Required Documents
-                     </h2>
-                  </motion.div>
+                  />
                   <ul className="space-y-2">
                      {documents.map((doc) => (
-                        <li
-                           key={doc}
-                           className="flex items-start gap-2.5 text-sm"
-                        >
-                           <UserCheck className="text-secondary mt-0.5 h-4 w-4 shrink-0" />
+                        <li key={doc} className="flex items-start gap-2.5 text-sm text-[var(--sp-text-muted)]">
+                           <UserCheck
+                              className="mt-0.5 h-4 w-4 shrink-0 text-[var(--sp-accent)]"
+                              aria-hidden="true"
+                           />
                            {doc}
                         </li>
                      ))}
@@ -191,23 +161,24 @@ export function AdmissionsContent() {
                </div>
 
                <motion.div
-                  initial={{ opacity: 0, y: 16 }}
+                  initial={reduced ? false : { opacity: 0, y: 20 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
-                  className="bg-navy flex flex-col justify-between rounded-2xl p-8 text-white"
+                  transition={reduced ? { duration: 0 } : { duration: 0.45, ease: 'easeOut' }}
+                  className="flex flex-col justify-between rounded-lg bg-[var(--sp-primary)] p-8 text-white shadow-[var(--shadow-elevated,0_8px_32px_rgba(15,81,50,0.18))]"
                >
                   <div>
-                     <h3 className="font-heading mb-3 text-xl font-bold text-white">
+                     <h3 className="font-display mb-3 text-xl font-bold text-white">
                         Admission Form
                      </h3>
-                     <p className="mb-6 text-sm text-white/80">
-                        Download the official KPPS Admission Form, fill it out,
-                        and submit it along with the required documents.
+                     <p className="mb-6 text-sm leading-relaxed text-white/80">
+                        Download the official KPPS Admission Form, fill it out, and submit it along
+                        with the required documents.
                      </p>
                   </div>
                   <div className="space-y-3">
-                     <Button variant="cta" size="lg" className="w-full">
-                        <Download className="h-4 w-4" />
+                     <Button variant="accent" size="lg" className="w-full">
+                        <Download className="h-4 w-4" aria-hidden="true" />
                         Download Admission Form (PDF)
                      </Button>
                      <p className="text-center text-xs text-white/50">
@@ -216,6 +187,7 @@ export function AdmissionsContent() {
                   </div>
                </motion.div>
             </div>
+
          </div>
       </section>
    )

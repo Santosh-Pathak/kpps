@@ -37,12 +37,11 @@ export function LeafMotif({ className = '', side = 'left' }: LeafMotifProps) {
       >
          <motion.path
             d={path}
-            stroke="#22C55E"
+            stroke="var(--sp-accent)"
             strokeWidth="1.5"
             strokeLinecap="round"
             fill="none"
             style={{ pathLength }}
-            className="dark:stroke-[#4ADE80]"
          />
       </svg>
    )

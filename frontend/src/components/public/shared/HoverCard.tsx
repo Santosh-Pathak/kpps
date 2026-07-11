@@ -2,6 +2,7 @@
 
 import { motion } from 'framer-motion'
 import { cn } from '@/lib/utils'
+import { useReducedMotion } from '@/hooks/useReducedMotion'
 import type { LucideIcon } from 'lucide-react'
 
 interface HoverCardProps {
@@ -13,26 +14,49 @@ interface HoverCardProps {
 }
 
 export function HoverCard({ icon: Icon, title, description, delay = 0, className }: HoverCardProps) {
+   const reduced = useReducedMotion()
+
    return (
       <motion.div
-         initial={{ opacity: 0, y: 24 }}
+         initial={reduced ? false : { opacity: 0, y: 20 }}
          whileInView={{ opacity: 1, y: 0 }}
-         viewport={{ once: true }}
-         transition={{ duration: 0.5, delay, ease: 'easeOut' }}
-         whileHover={{ y: -4 }}
+         viewport={{ once: true, margin: '-40px' }}
+         transition={reduced ? { duration: 0 } : { duration: 0.45, delay, ease: 'easeOut' }}
+         whileHover={reduced ? undefined : { y: -4, transition: { duration: 0.15, ease: 'easeOut' } }}
          className={cn(
-            'group flex gap-4 rounded-2xl border border-[#E3F0E9] bg-white p-6 transition-shadow duration-200 hover:shadow-md dark:border-[#1C4632] dark:bg-[#0F2A1E]',
+            'group flex gap-4 rounded-lg border bg-[var(--card)] p-6',
+            'border-[var(--sp-border)]',
+            'shadow-[var(--shadow-card,0_2px_16px_rgba(15,81,50,0.06))]',
+            'transition-shadow duration-200',
+            'hover:shadow-[var(--shadow-elevated,0_8px_32px_rgba(15,81,50,0.12))]',
             className
          )}
       >
-         <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-[#D1FAE5] transition-colors duration-150 group-hover:bg-[#22C55E] dark:bg-[#0F3D2E] dark:group-hover:bg-[#22C55E]">
-            <Icon className="h-6 w-6 text-[#0F5132] transition-colors duration-150 group-hover:text-white dark:text-[#22C55E] dark:group-hover:text-[#0A1F16]" />
+         {/* Icon container — fills on hover */}
+         <div
+            className={cn(
+               'flex h-12 w-12 shrink-0 items-center justify-center rounded-md',
+               'bg-[var(--sp-accent-soft)]',
+               'transition-colors duration-200',
+               'group-hover:bg-[var(--sp-accent)]'
+            )}
+         >
+            <Icon
+               className={cn(
+                  'h-6 w-6',
+                  'text-[var(--sp-primary)]',
+                  'transition-colors duration-200',
+                  'group-hover:text-white'
+               )}
+               aria-hidden="true"
+            />
          </div>
-         <div>
-            <h3 className="font-display mb-1 text-base font-semibold text-[#0B1F17] dark:text-[#F0FBF6]">
+
+         <div className="min-w-0">
+            <h3 className="font-display mb-1 text-base font-semibold text-[var(--sp-text)]">
                {title}
             </h3>
-            <p className="text-sm leading-relaxed text-[#4B6358] dark:text-[#9CC7B3]">
+            <p className="text-sm leading-relaxed text-[var(--sp-text-muted)]">
                {description}
             </p>
          </div>

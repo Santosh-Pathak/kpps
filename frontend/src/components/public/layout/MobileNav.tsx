@@ -1,10 +1,11 @@
 'use client'
 
-import { useEffect } from 'react'
+import { useEffect, useRef } from 'react'
 import Link from 'next/link'
 import { motion, AnimatePresence } from 'framer-motion'
-import { X } from 'lucide-react'
+import { X, ChevronRight } from 'lucide-react'
 import { Logo } from '@/components/public/shared/Logo'
+import { cn } from '@/lib/utils'
 
 interface NavItem {
    label: string
@@ -13,14 +14,11 @@ interface NavItem {
 }
 
 interface MobileNavProps {
+   id: string
    items: NavItem[]
    open: boolean
    onClose: () => void
-}
-
-const overlayVariants = {
-   hidden: { opacity: 0 },
-   visible: { opacity: 1 },
+   currentPath: string
 }
 
 const drawerVariants = {
@@ -30,88 +28,136 @@ const drawerVariants = {
 
 const listVariants = {
    hidden: {},
-   visible: { transition: { staggerChildren: 0.055, delayChildren: 0.1 } },
+   visible: { transition: { staggerChildren: 0.05, delayChildren: 0.08 } },
 }
 
 const itemVariants = {
-   hidden: { opacity: 0, x: 24 },
-   visible: { opacity: 1, x: 0, transition: { duration: 0.3, ease: 'easeOut' } },
+   hidden: { opacity: 0, x: 20 },
+   visible: { opacity: 1, x: 0, transition: { duration: 0.25, ease: 'easeOut' } },
 }
 
-export function MobileNav({ items, open, onClose }: MobileNavProps) {
+export function MobileNav({ id, items, open, onClose, currentPath }: MobileNavProps) {
+   const closeRef = useRef<HTMLButtonElement>(null)
+
+   // Lock body scroll while open
    useEffect(() => {
       document.body.style.overflow = open ? 'hidden' : ''
       return () => { document.body.style.overflow = '' }
    }, [open])
 
+   // Close on Escape key
+   useEffect(() => {
+      if (!open) return
+      const handler = (e: KeyboardEvent) => {
+         if (e.key === 'Escape') onClose()
+      }
+      window.addEventListener('keydown', handler)
+      return () => window.removeEventListener('keydown', handler)
+   }, [open, onClose])
+
+   // Move focus to close button when drawer opens
+   useEffect(() => {
+      if (open) {
+         // Defer one tick so the element is visible before focusing
+         const id = setTimeout(() => closeRef.current?.focus(), 50)
+         return () => clearTimeout(id)
+      }
+   }, [open])
+
+   function isActive(href: string) {
+      if (href === '/') return currentPath === '/'
+      return currentPath === href || currentPath.startsWith(href + '/')
+   }
+
    return (
       <AnimatePresence>
          {open && (
             <>
-               {/* Backdrop */}
+               {/* ── Backdrop ──────────────────────────────────────────────── */}
                <motion.div
                   key="backdrop"
-                  variants={overlayVariants}
-                  initial="hidden"
-                  animate="visible"
-                  exit="hidden"
-                  transition={{ duration: 0.25 }}
-                  className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm xl:hidden"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.2 }}
+                  className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm lg:hidden"
                   onClick={onClose}
+                  aria-hidden="true"
                />
 
-               {/* Drawer */}
+               {/* ── Drawer ────────────────────────────────────────────────── */}
                <motion.div
+                  id={id}
                   key="drawer"
+                  role="dialog"
+                  aria-modal="true"
+                  aria-label="Navigation menu"
                   variants={drawerVariants}
                   initial="hidden"
                   animate="visible"
                   exit="hidden"
-                  transition={{ duration: 0.3, ease: [0.25, 1, 0.5, 1] }}
-                  className="fixed top-0 right-0 bottom-0 z-50 flex w-[85vw] max-w-sm flex-col bg-white shadow-2xl xl:hidden dark:bg-[#0A1F16]"
+                  transition={{ duration: 0.28, ease: [0.25, 1, 0.5, 1] }}
+                  className="fixed top-0 right-0 bottom-0 z-50 flex w-[85vw] max-w-sm flex-col bg-white shadow-2xl lg:hidden dark:bg-[var(--sp-bg)]"
                >
-                  {/* Header */}
-                  <div className="flex items-center justify-between border-b border-[#E3F0E9] p-4 dark:border-[#1C4632]">
+                  {/* Header row */}
+                  <div className="flex items-center justify-between border-b border-[var(--sp-border)] px-4 py-3">
                      <Logo size="sm" />
-                     <motion.button
+                     <button
+                        ref={closeRef}
                         onClick={onClose}
-                        className="rounded-lg p-2 transition-colors hover:bg-[#D1FAE5] dark:hover:bg-[#0F3D2E]"
-                        whileTap={{ scale: 0.9 }}
-                        aria-label="Close menu"
+                        className={cn(
+                           'flex h-10 w-10 items-center justify-center rounded-md',
+                           'text-[var(--sp-text)] transition-colors duration-150',
+                           'hover:bg-[var(--sp-accent-soft)]',
+                           'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--sp-accent)]'
+                        )}
+                        aria-label="Close navigation menu"
                      >
-                        <motion.div
-                           animate={{ rotate: open ? 180 : 0 }}
-                           transition={{ duration: 0.3 }}
-                        >
-                           <X className="h-5 w-5 text-[#0B1F17] dark:text-[#F0FBF6]" />
-                        </motion.div>
-                     </motion.button>
+                        <X className="h-5 w-5" aria-hidden="true" />
+                     </button>
                   </div>
 
-                  {/* Nav items */}
-                  <nav className="flex-1 overflow-y-auto p-4 pb-28">
-                     <motion.div
-                        variants={listVariants}
-                        initial="hidden"
-                        animate="visible"
-                     >
+                  {/* Nav links — scrollable, bottom padding leaves room for sticky CTA */}
+                  <nav
+                     className="flex-1 overflow-y-auto px-3 py-4 pb-32"
+                     aria-label="Main navigation"
+                  >
+                     <motion.div variants={listVariants} initial="hidden" animate="visible">
                         {items.map((item) => (
-                           <motion.div key={item.label} variants={itemVariants} className="mb-1">
+                           <motion.div key={item.label} variants={itemVariants} className="mb-0.5">
                               <Link
                                  href={item.href}
                                  onClick={onClose}
-                                 className="block min-h-[48px] rounded-xl px-4 py-3 text-base font-semibold text-[#0B1F17] transition-colors hover:bg-[#D1FAE5] hover:text-[#0F5132] dark:text-[#F0FBF6] dark:hover:bg-[#0F3D2E] dark:hover:text-[#22C55E]"
+                                 aria-current={isActive(item.href) ? 'page' : undefined}
+                                 className={cn(
+                                    'flex min-h-[3rem] items-center rounded-md px-4 py-2.5',
+                                    'text-base font-semibold transition-colors duration-150',
+                                    'hover:bg-[var(--sp-accent-soft)] hover:text-[var(--sp-primary)]',
+                                    'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--sp-accent)]',
+                                    isActive(item.href)
+                                       ? 'bg-[var(--sp-accent-soft)] text-[var(--sp-primary)]'
+                                       : 'text-[var(--sp-text)]'
+                                 )}
                               >
                                  {item.label}
+                                 {item.children && (
+                                    <ChevronRight className="ml-auto h-4 w-4 opacity-40" aria-hidden="true" />
+                                 )}
                               </Link>
+
                               {item.children && (
-                                 <div className="mb-1 ml-4 border-l-2 border-[#E3F0E9] pl-3 dark:border-[#1C4632]">
+                                 <div className="ml-4 mt-0.5 border-l-2 border-[var(--sp-border)] pl-3 pb-1">
                                     {item.children.map((child) => (
                                        <Link
                                           key={child.label}
                                           href={child.href}
                                           onClick={onClose}
-                                          className="block min-h-[44px] py-2 text-sm text-[#4B6358] transition-colors hover:text-[#0F5132] dark:text-[#9CC7B3] dark:hover:text-[#22C55E]"
+                                          className={cn(
+                                             'flex min-h-[2.75rem] items-center py-1.5 text-sm',
+                                             'text-[var(--sp-text-muted)] transition-colors duration-150',
+                                             'hover:text-[var(--sp-primary)]',
+                                             'focus-visible:outline-none focus-visible:rounded focus-visible:ring-2 focus-visible:ring-[var(--sp-accent)]'
+                                          )}
                                        >
                                           {child.label}
                                        </Link>
@@ -121,11 +167,20 @@ export function MobileNav({ items, open, onClose }: MobileNavProps) {
                            </motion.div>
                         ))}
 
-                        <motion.div variants={itemVariants} className="mt-4 border-t border-[#E3F0E9] pt-4 dark:border-[#1C4632]">
+                        {/* Admin login — subtle, at the bottom */}
+                        <motion.div
+                           variants={itemVariants}
+                           className="mt-3 border-t border-[var(--sp-border)] pt-3"
+                        >
                            <Link
                               href="/admin"
                               onClick={onClose}
-                              className="block rounded-xl px-4 py-2.5 text-sm text-[#4B6358] transition-colors hover:bg-[#F6FBF8] dark:text-[#9CC7B3] dark:hover:bg-[#0F2A1E]"
+                              className={cn(
+                                 'block rounded-md px-4 py-2.5 text-sm',
+                                 'text-[var(--sp-text-muted)] transition-colors duration-150',
+                                 'hover:bg-[var(--sp-bg-alt)] hover:text-[var(--sp-primary)]',
+                                 'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--sp-accent)]'
+                              )}
                            >
                               Admin Login
                            </Link>
@@ -133,12 +188,17 @@ export function MobileNav({ items, open, onClose }: MobileNavProps) {
                      </motion.div>
                   </nav>
 
-                  {/* Bottom CTA */}
-                  <div className="border-t border-[#E3F0E9] p-4 dark:border-[#1C4632]">
+                  {/* Bottom CTA — single Apply action */}
+                  <div className="border-t border-[var(--sp-border)] p-4">
                      <Link
                         href="/admissions"
                         onClick={onClose}
-                        className="block w-full rounded-xl bg-[#0F5132] py-3.5 text-center text-sm font-bold text-white transition-colors hover:bg-[#0B3D26]"
+                        className={cn(
+                           'flex min-h-[3rem] w-full items-center justify-center rounded-lg',
+                           'bg-[var(--sp-primary)] text-sm font-bold text-white',
+                           'transition-colors duration-150 hover:bg-[var(--sp-primary-dark)]',
+                           'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--sp-accent)] focus-visible:ring-offset-2'
+                        )}
                      >
                         Apply for Admission
                      </Link>

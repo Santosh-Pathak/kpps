@@ -58,28 +58,28 @@ export const heroSlides: HeroSlide[] = [
          'Give your child the best start — CBSE excellence, expert faculty, and a campus built for growth.',
       primaryCta: { label: 'Apply Now', href: '/admissions' },
       secondaryCta: { label: 'Explore Academics', href: '/academics' },
-      // TODO: replace with real campus photo — description: school building main entrance
-      image: 'https://picsum.photos/seed/kpps-hero-1/1600/900',
+      // Happy children learning with teacher in a bright classroom
+      image: 'https://images.unsplash.com/photo-1503676260728-1c00da094a0b?w=1600&h=900&fit=crop&q=80',
    },
    {
       id: 2,
       headline: 'Building Global Citizens',
       subtext:
          'Sports, arts, cultural events, and educational trips that shape confident, well-rounded individuals.',
-      primaryCta: { label: 'See Activities', href: '/activities' },
-      secondaryCta: { label: 'Our Facilities', href: '/facilities' },
-      // TODO: replace with real photo — description: students at sports day or cultural event
-      image: 'https://picsum.photos/seed/kpps-hero-2/1600/900',
+      primaryCta: { label: 'Our Facilities', href: '/facilities' },
+      secondaryCta: { label: 'Photo Gallery', href: '/gallery' },
+      // Kids playing football/soccer on school grounds
+      image: 'https://images.unsplash.com/photo-1529680106979-a7fb65d70d28?w=1600&h=900&fit=crop&q=80',
    },
    {
       id: 3,
       headline: 'Excellence in Every Classroom',
       subtext:
          'Consistent board toppers, 100% pass rate, smart classrooms — learning that goes beyond textbooks.',
-      primaryCta: { label: 'View Achievements', href: '/achievements' },
+      primaryCta: { label: 'Explore Academics', href: '/academics' },
       secondaryCta: { label: 'Contact Us', href: '/contact' },
-      // TODO: replace with real photo — description: students in a smart classroom
-      image: 'https://picsum.photos/seed/kpps-hero-3/1600/900',
+      // Modern classroom with students and projector
+      image: 'https://images.unsplash.com/photo-1509062522246-3755977927d7?w=1600&h=900&fit=crop&q=80',
    },
    {
       id: 4,
@@ -88,8 +88,8 @@ export const heroSlides: HeroSlide[] = [
          'CCTV-secured, GPS-tracked transport, and a nurturing environment where every child feels at home.',
       primaryCta: { label: 'Book a Campus Visit', href: '/contact' },
       secondaryCta: { label: 'About KPPS', href: '/about' },
-      // TODO: replace with real photo — description: school campus greenery / playground
-      image: 'https://picsum.photos/seed/kpps-hero-4/1600/900',
+      // Aerial/wide view of university/school campus with greenery
+      image: 'https://images.unsplash.com/photo-1562774053-701939374585?w=1600&h=900&fit=crop&q=80',
    },
 ]
 
@@ -114,8 +114,8 @@ export const stats: Stat[] = [
 export const principal = {
    name: 'Dr. Anita Sharma',
    qualification: 'M.Ed., Ph.D. | Principal, KPPS',
-   // TODO: replace with real principal photo — description: principal professional portrait
-   photo: 'https://picsum.photos/seed/kpps-principal/400/400',
+   // Professional portrait of a woman educator
+   photo: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=400&h=500&fit=crop&crop=faces&q=80',
    quote:
       'Education is not the filling of a pail, but the lighting of a fire. At KPPS, we kindle that spark of curiosity in every child and guide them to become responsible, knowledgeable, and compassionate human beings.',
    readMoreHref: '/about#principal',
@@ -222,57 +222,57 @@ export const facilities: Facility[] = [
       icon: Library,
       name: 'Library',
       desc: '3000+ books & digital resources',
-      // TODO: replace with real photo — description: school library interior
-      image: 'https://picsum.photos/seed/kpps-facility-library/800/500',
+      // Interior of a large, well-lit school/university library with bookshelves
+      image: 'https://images.unsplash.com/photo-1521587760476-6c12a4b040da?w=800&h=500&fit=crop&q=80',
    },
    {
       icon: Microscope,
       name: 'Science Labs',
       desc: 'Physics, Chemistry & Biology',
-      // TODO: replace with real photo — description: students in science lab
-      image: 'https://picsum.photos/seed/kpps-facility-lab/800/500',
+      // Students working in a science laboratory with equipment
+      image: 'https://images.unsplash.com/photo-1532094349884-543290326c36?w=800&h=500&fit=crop&q=80',
    },
    {
       icon: Monitor,
       name: 'Computer Lab',
       desc: 'Latest hardware & broadband',
-      // TODO: replace with real photo — description: computer lab with students
-      image: 'https://picsum.photos/seed/kpps-facility-computer/800/500',
+      // Modern computer lab with laptops/desktops in rows
+      image: 'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=800&h=500&fit=crop&q=80',
    },
    {
       icon: Trophy,
       name: 'Sports Ground',
       desc: 'Cricket, Football, Basketball',
-      // TODO: replace with real photo — description: school sports ground
-      image: 'https://picsum.photos/seed/kpps-facility-sports/800/500',
+      // Children playing football/soccer on a school sports ground
+      image: 'https://images.unsplash.com/photo-1529680106979-a7fb65d70d28?w=800&h=500&fit=crop&q=80',
    },
    {
       icon: Bus,
       name: 'Safe Transport',
       desc: 'GPS-tracked fleet',
-      // TODO: replace with real photo — description: school bus
-      image: 'https://picsum.photos/seed/kpps-facility-bus/800/500',
+      // Yellow school bus on road
+      image: 'https://images.unsplash.com/photo-1570125909232-eb263c188f7e?w=800&h=500&fit=crop&q=80',
    },
    {
       icon: Mic,
       name: 'Auditorium',
       desc: 'Fully equipped stage & AV',
-      // TODO: replace with real photo — description: school auditorium
-      image: 'https://picsum.photos/seed/kpps-facility-auditorium/800/500',
+      // Empty auditorium/lecture hall with rows of seats and stage lighting
+      image: 'https://images.unsplash.com/photo-1519327232521-1fc4973a8054?w=800&h=500&fit=crop&q=80',
    },
    {
       icon: Heart,
       name: 'Medical Room',
       desc: 'First aid & nurse on duty',
-      // TODO: replace with real photo — description: school medical room
-      image: 'https://picsum.photos/seed/kpps-facility-medical/800/500',
+      // Clean medical/clinic room with first-aid supplies
+      image: 'https://images.unsplash.com/photo-1631217868264-e5b90bb7e133?w=800&h=500&fit=crop&q=80',
    },
    {
       icon: UtensilsCrossed,
       name: 'Cafeteria',
       desc: 'Hygienic & nutritious meals',
-      // TODO: replace with real photo — description: school cafeteria
-      image: 'https://picsum.photos/seed/kpps-facility-cafeteria/800/500',
+      // Bright, clean school cafeteria with food counters
+      image: 'https://images.unsplash.com/photo-1567521464027-f127ff144326?w=800&h=500&fit=crop&q=80',
    },
 ]
 
@@ -289,40 +289,40 @@ export const activities: Activity[] = [
    {
       title: 'Annual Sports Day',
       category: 'Sports',
-      // TODO: replace with real photo — description: sports day event crowd
-      image: 'https://picsum.photos/seed/kpps-act-sports/600/800',
+      // Kids running a race at a school sports day event
+      image: 'https://images.unsplash.com/photo-1486218119243-13301543a1b4?w=600&h=800&fit=crop&q=80',
       tall: true,
    },
    {
       title: 'Science Exhibition',
       category: 'Academics',
-      // TODO: replace with real photo — description: students at science fair
-      image: 'https://picsum.photos/seed/kpps-act-science/600/400',
+      // Students working on a science fair experiment/display
+      image: 'https://images.unsplash.com/photo-1628595351029-c2bf17511435?w=600&h=400&fit=crop&q=80',
    },
    {
       title: 'Cultural Fest',
       category: 'Arts',
-      // TODO: replace with real photo — description: students performing on stage
-      image: 'https://picsum.photos/seed/kpps-act-culture/600/400',
+      // Students performing on stage during a cultural event
+      image: 'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=600&h=400&fit=crop&q=80',
    },
    {
       title: 'Educational Tour',
       category: 'Trips',
-      // TODO: replace with real photo — description: students on educational trip
-      image: 'https://picsum.photos/seed/kpps-act-trip/600/700',
+      // Group of students on an educational excursion/field trip
+      image: 'https://images.unsplash.com/photo-1436491865332-7a61a109cc05?w=600&h=700&fit=crop&q=80',
       tall: true,
    },
    {
       title: 'Art Workshop',
       category: 'Arts',
-      // TODO: replace with real photo — description: art class students
-      image: 'https://picsum.photos/seed/kpps-act-art/600/400',
+      // Children working with paint and brushes in an art class
+      image: 'https://images.unsplash.com/photo-1513364776144-60967b0f800f?w=600&h=400&fit=crop&q=80',
    },
    {
       title: 'Music Performance',
       category: 'Arts',
-      // TODO: replace with real photo — description: school music performance
-      image: 'https://picsum.photos/seed/kpps-act-music/600/400',
+      // Student playing piano / musicians performing at school event
+      image: 'https://images.unsplash.com/photo-1514320291840-2e0a9bf2a9ae?w=600&h=400&fit=crop&q=80',
    },
 ]
 
@@ -381,21 +381,24 @@ export const testimonials: Testimonial[] = [
       role: 'Parent — Class IX',
       quote:
          "KPPS has been a transformative experience for my daughter. The teachers genuinely care about every child's progress and the environment is wonderfully nurturing.",
-      avatar: 'https://picsum.photos/seed/kpps-testi-1/80/80',
+      // Portrait of a woman, warm expression
+      avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=80&h=80&fit=crop&crop=faces&q=80',
    },
    {
       name: 'Rahul Verma',
       role: 'Alumni 2023',
       quote:
          'The foundation built at KPPS helped me score 97% in boards and secure admission in a top engineering college. Forever grateful.',
-      avatar: 'https://picsum.photos/seed/kpps-testi-2/80/80',
+      // Portrait of a young man, smiling
+      avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=80&h=80&fit=crop&crop=faces&q=80',
    },
    {
       name: 'Meena Gupta',
       role: 'Parent — Class VI',
       quote:
          'The smart classrooms and activity-based learning have made my son genuinely love going to school every morning. That says it all.',
-      avatar: 'https://picsum.photos/seed/kpps-testi-3/80/80',
+      // Portrait of a woman with a warm smile
+      avatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=80&h=80&fit=crop&crop=faces&q=80',
    },
 ]
 

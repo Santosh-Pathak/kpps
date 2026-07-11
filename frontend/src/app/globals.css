@@ -419,6 +419,8 @@
   /* Font stacks */
   --font-display: var(--font-fraunces), 'Georgia', serif;
   --font-body: var(--font-plus-jakarta), 'system-ui', sans-serif;
+  /* Legacy navy alias → renders as KPPS primary so dead classes stop being invisible */
+  --color-navy: #0F5132;
 }
 
 .school-public {
@@ -442,7 +444,17 @@
   --border: #E3F0E9;
   --input: #E3F0E9;
   --ring: #22C55E;
-  --radius: 0.5rem;
+  /* Precision radius scale: 6 / 10 / 16 / 20 px */
+  --radius: 0.625rem;    /* 10px — base used by shadcn calc() derivations  */
+  --radius-sm: 0.375rem; /* 6px  — tight UI chips, inline tags              */
+  --radius-md: 0.625rem; /* 10px — buttons, inputs, selects                 */
+  --radius-lg: 1rem;     /* 16px — cards, panels, dialogs                   */
+  --radius-xl: 1.25rem;  /* 20px — large feature cards, hero panels         */
+  /* Soft, diffuse green-tinted shadows — never harsh default box-shadow */
+  --shadow-soft: 0 4px 24px rgba(15, 81, 50, 0.08);
+  --shadow-card: 0 2px 16px rgba(15, 81, 50, 0.06);
+  --shadow-elevated: 0 8px 32px rgba(15, 81, 50, 0.12);
+  --shadow-button: 0 2px 12px rgba(15, 81, 50, 0.20);
   --bg-primary: #FFFFFF;
   --fg-primary: #0B1F17;
   /* Named brand vars for direct use in components */
@@ -491,6 +503,11 @@ html.dark .school-public {
   --sp-text: #F0FBF6;
   --sp-text-muted: #9CC7B3;
   --sp-border: #1C4632;
+  /* Dark-mode shadows — lower opacity, lighter tint */
+  --shadow-soft: 0 4px 24px rgba(0, 0, 0, 0.30);
+  --shadow-card: 0 2px 16px rgba(0, 0, 0, 0.24);
+  --shadow-elevated: 0 8px 32px rgba(0, 0, 0, 0.40);
+  --shadow-button: 0 2px 12px rgba(34, 197, 94, 0.25);
 }
 
 .school-public .font-display,
@@ -538,6 +555,24 @@ html.dark .school-public {
   letter-spacing: 0.12em;
   text-transform: uppercase;
   color: var(--sp-accent);
+}
+
+.kpps-h3 {
+  font-family: var(--font-body);
+  font-size: clamp(1.375rem, 2vw, 1.75rem);
+  font-weight: 600;
+  line-height: 1.3;
+  color: var(--sp-text);
+}
+
+/* Unified card recipe — apply in addition to shadcn <Card> when needed as a standalone class */
+.kpps-card {
+  background: var(--card);
+  border: 1px solid var(--sp-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
+  padding: 1.5rem;
+  color: var(--foreground);
 }
 
 /* prefers-reduced-motion helper — used in Framer configs */

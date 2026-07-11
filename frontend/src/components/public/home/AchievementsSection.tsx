@@ -5,41 +5,37 @@ import { motion } from 'framer-motion'
 import Marquee from 'react-fast-marquee'
 import { Trophy, ArrowRight } from 'lucide-react'
 import { achievementMarquee, featuredAchievements } from '@/lib/dummy-data'
+import { SectionHeading } from '@/components/public/shared/SectionHeading'
+import { useReducedMotion } from '@/hooks/useReducedMotion'
+import { cn } from '@/lib/utils'
 
 export function AchievementsSection() {
-   return (
-      <section className="section-pad bg-[#FFFFFF] dark:bg-[#0A1F16]">
-         <div className="container-kpps">
-            <motion.div
-               initial={{ opacity: 0, y: 20 }}
-               whileInView={{ opacity: 1, y: 0 }}
-               viewport={{ once: true }}
-               transition={{ duration: 0.5 }}
-               className="mb-10 text-center"
-            >
-               <p className="kpps-eyebrow mb-3">Proud Moments</p>
-               <h2 className="kpps-h2 font-display mb-3 text-[#0B1F17] dark:text-[#F0FBF6]">
-                  Our Achievements
-               </h2>
-               <p className="mx-auto max-w-lg text-[#4B6358] dark:text-[#9CC7B3]">
-                  KPPS students consistently excel in academics, sports, and co-curricular activities.
-               </p>
-            </motion.div>
+   const reduced = useReducedMotion()
 
-            {/* Marquee ticker */}
-            <div className="mb-12 rounded-xl bg-[#F6FBF8] py-3 dark:bg-[#0F2A1E]">
+   return (
+      <section className="section-pad bg-[var(--sp-bg)]">
+         <div className="container-kpps">
+            <SectionHeading
+               eyebrow="Proud Moments"
+               title="Our Achievements"
+               description="KPPS students consistently excel in academics, sports, and co-curricular activities."
+               className="mb-10"
+            />
+
+            {/* Achievement ticker — paused when reduced motion is on */}
+            <div className="mb-12 overflow-hidden rounded-lg bg-[var(--sp-bg-alt)] py-3">
                <Marquee
                   pauseOnHover
+                  play={!reduced}
                   speed={40}
                   gradient={false}
-                  className="overflow-hidden"
                >
                   {achievementMarquee.map((item) => (
                      <span
                         key={item}
-                        className="mx-8 inline-flex items-center gap-2 text-sm font-semibold text-[#0F5132] dark:text-[#22C55E]"
+                        className="mx-8 inline-flex items-center gap-2 text-sm font-semibold text-[var(--sp-primary)]"
                      >
-                        <Trophy className="h-4 w-4 text-[#22C55E]" />
+                        <Trophy className="h-4 w-4 text-[var(--sp-accent)]" aria-hidden="true" />
                         {item}
                      </span>
                   ))}
@@ -51,36 +47,51 @@ export function AchievementsSection() {
                {featuredAchievements.map((a, i) => (
                   <motion.div
                      key={a.title}
-                     initial={{ opacity: 0, y: 16 }}
+                     initial={reduced ? false : { opacity: 0, y: 16 }}
                      whileInView={{ opacity: 1, y: 0 }}
                      viewport={{ once: true }}
                      transition={{ delay: i * 0.1 }}
-                     whileHover={{ y: -4 }}
-                     className="relative overflow-hidden rounded-2xl border border-[#E3F0E9] bg-white p-6 text-center shadow-sm transition-shadow hover:shadow-md dark:border-[#1C4632] dark:bg-[#0F2A1E]"
+                     whileHover={reduced ? {} : { y: -4, transition: { duration: 0.15, ease: 'easeOut' } }}
+                     className={cn(
+                        'relative overflow-hidden rounded-lg border border-[var(--sp-border)] bg-[var(--sp-bg)] p-6 text-center',
+                        'shadow-[var(--shadow-card,0_2px_16px_rgba(15,81,50,0.06))]',
+                        'transition-shadow duration-200',
+                        'hover:shadow-[var(--shadow-elevated,0_8px_32px_rgba(15,81,50,0.12))]'
+                     )}
                   >
                      {/* Emerald ribbon accent */}
-                     <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#22C55E] to-[#D1FAE5]" />
+                     <div
+                        className="absolute top-0 right-0 left-0 h-1 bg-gradient-to-r from-[var(--sp-accent)] to-[var(--sp-accent-soft)]"
+                        aria-hidden="true"
+                     />
 
-                     <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-[#D1FAE5] dark:bg-[#0F3D2E]">
-                        <a.icon className="h-7 w-7 text-[#0F5132] dark:text-[#22C55E]" />
+                     <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-[var(--sp-accent-soft)]">
+                        <a.icon className="h-7 w-7 text-[var(--sp-primary)]" aria-hidden="true" />
                      </div>
-                     <span className="rounded-full bg-[#F6FBF8] px-2 py-0.5 text-xs font-semibold text-[#4B6358] dark:bg-[#0F3D2E] dark:text-[#9CC7B3]">
+
+                     <span className="rounded-full bg-[var(--sp-bg-alt)] px-2 py-0.5 text-xs font-semibold text-[var(--sp-text-muted)]">
                         {a.year}
                      </span>
-                     <h3 className="font-display mt-2 mb-1 text-sm font-semibold text-[#0B1F17] dark:text-[#F0FBF6]">
+
+                     <h3 className="font-display mt-2 mb-1 text-sm font-semibold text-[var(--sp-text)]">
                         {a.title}
                      </h3>
-                     <p className="text-xs text-[#4B6358] dark:text-[#9CC7B3]">{a.detail}</p>
+                     <p className="text-xs leading-relaxed text-[var(--sp-text-muted)]">{a.detail}</p>
                   </motion.div>
                ))}
             </div>
 
             <div className="mt-8 text-center">
+               {/* /achievements has no route — linking to /gallery which showcases school life */}
                <Link
-                  href="/achievements"
-                  className="inline-flex items-center gap-2 font-semibold text-[#0F5132] transition-colors hover:text-[#22C55E] dark:text-[#22C55E]"
+                  href="/gallery"
+                  className={cn(
+                     'inline-flex items-center gap-2 font-semibold',
+                     'text-[var(--sp-primary)] transition-colors hover:text-[var(--sp-accent)]',
+                     'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)] rounded-sm'
+                  )}
                >
-                  View All Achievements <ArrowRight className="h-4 w-4" />
+                  View School Gallery <ArrowRight className="h-4 w-4" aria-hidden="true" />
                </Link>
             </div>
          </div>

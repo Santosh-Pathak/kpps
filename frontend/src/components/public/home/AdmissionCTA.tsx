@@ -8,6 +8,7 @@ import * as z from 'zod'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { Label } from '@/components/ui/label'
+import { Button } from '@/components/ui/button'
 import {
    Select,
    SelectContent,
@@ -15,15 +16,17 @@ import {
    SelectTrigger,
    SelectValue,
 } from '@/components/ui/select'
-import { CheckCircle2, Loader2 } from 'lucide-react'
+import { CheckCircle2, Loader2, Phone } from 'lucide-react'
 import toast from 'react-hot-toast'
 import { LeadsAPI } from '@/services/apis/leads.api'
 import { OrganicBlob } from '@/components/public/shared/OrganicBlob'
+import { useReducedMotion } from '@/hooks/useReducedMotion'
+import { cn } from '@/lib/utils'
 
 const schema = z.object({
    name: z.string().min(2, 'Name must be at least 2 characters'),
    phone: z.string().regex(/^[6-9]\d{9}$/, 'Enter a valid 10-digit mobile number'),
-   email: z.string().email().optional().or(z.literal('')),
+   email: z.string().email('Enter a valid email').optional().or(z.literal('')),
    classApplying: z.string().optional(),
    message: z.string().optional(),
 })
@@ -36,37 +39,29 @@ const classes = [
 ]
 
 const bullets = [
-   'Classes Nursery to XII (Science / Commerce / Arts)',
-   'Limited seats — apply early',
-   'Scholarships available for meritorious students',
-   'Simple 4-step admission process',
+   'Classes Nursery to XII — Science, Commerce & Arts',
+   'Limited seats available — apply early to secure your spot',
+   'Scholarships for meritorious students',
+   'Simple 4-step admission process, guided by our team',
 ]
 
 export function AdmissionCTA() {
    const [loading, setLoading] = useState(false)
    const [submitted, setSubmitted] = useState(false)
+   const reduced = useReducedMotion()
 
-   const { register, handleSubmit, reset, setValue, formState: { errors } } = useForm<FormValues>({
-      resolver: zodResolver(schema),
-   })
+   const {
+      register,
+      handleSubmit,
+      reset,
+      setValue,
+      formState: { errors },
+   } = useForm<FormValues>({ resolver: zodResolver(schema) })
 
    const onSubmit = async (data: FormValues) => {
       setLoading(true)
       try {
          await LeadsAPI.createEnquiry(data)
-
-         // Confetti burst — single celebration moment
-         if (typeof window !== 'undefined') {
-            const confetti = (await import('canvas-confetti')).default
-            confetti({
-               particleCount: 80,
-               spread: 70,
-               origin: { y: 0.7 },
-               colors: ['#22C55E', '#D1FAE5', '#0F5132', '#4ADE80', '#ffffff'],
-               zIndex: 9999,
-            })
-         }
-
          setSubmitted(true)
          reset()
          toast.success("Enquiry submitted! We'll contact you within 24 hours.")
@@ -78,139 +73,155 @@ export function AdmissionCTA() {
    }
 
    return (
-      <section id="enquiry" className="relative overflow-hidden bg-[#0F5132] py-16 text-white md:py-24">
-         <OrganicBlob className="-top-24 -right-20" size={400} opacity={0.12} />
-         <OrganicBlob className="-bottom-20 -left-16" size={320} opacity={0.08} />
+      <section
+         id="enquiry"
+         className="relative overflow-hidden bg-[var(--sp-primary)] py-16 text-white md:py-24"
+      >
+         <OrganicBlob className="-top-24 -right-20" size={400} opacity={0.10} />
+         <OrganicBlob className="-bottom-20 -left-16" size={320} opacity={0.07} />
 
          <div className="container-kpps relative z-10">
             <div className="grid items-center gap-12 lg:grid-cols-2">
-               {/* Left copy */}
+
+               {/* ── Left: copy ────────────────────────────────────────────── */}
                <motion.div
-                  initial={{ opacity: 0, x: -24 }}
-                  whileInView={{ opacity: 1, x: 0 }}
+                  initial={reduced ? false : { opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
-                  transition={{ duration: 0.6 }}
+                  transition={reduced ? { duration: 0 } : { duration: 0.5, ease: 'easeOut' }}
                >
-                  <p className="mb-3 text-xs font-bold uppercase tracking-widest text-[#22C55E]">
+                  <p className="mb-3 text-xs font-bold uppercase tracking-widest text-[var(--sp-accent)]">
                      Admissions
                   </p>
                   <h2 className="kpps-h2 font-display mb-4 font-bold text-white">
-                     Admissions Open for 2025–26
+                     Admissions Open for {new Date().getFullYear()}–{String(new Date().getFullYear() + 1).slice(-2)}
                   </h2>
                   <p className="mb-7 text-lg leading-relaxed text-white/80">
                      Give your child the best start in life. Fill in the enquiry form and our
                      admissions team will reach out to guide you through the process.
                   </p>
-                  <ul className="space-y-3">
+                  <ul className="space-y-3" aria-label="Admission highlights">
                      {bullets.map((item) => (
-                        <li key={item} className="flex items-start gap-2 text-sm text-white/80">
-                           <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[#22C55E]/20">
-                              <CheckCircle2 className="h-3.5 w-3.5 text-[#22C55E]" />
-                           </span>
+                        <li key={item} className="flex items-start gap-3 text-sm text-white/80">
+                           <CheckCircle2
+                              className="mt-0.5 h-4 w-4 shrink-0 text-[var(--sp-accent)]"
+                              aria-hidden="true"
+                           />
                            {item}
                         </li>
                      ))}
                   </ul>
                </motion.div>
 
-               {/* Form */}
+               {/* ── Right: form ───────────────────────────────────────────── */}
                <motion.div
-                  initial={{ opacity: 0, x: 24 }}
-                  whileInView={{ opacity: 1, x: 0 }}
+                  initial={reduced ? false : { opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
-                  transition={{ duration: 0.6, delay: 0.1 }}
-                  className="rounded-2xl bg-white/10 p-6 backdrop-blur-sm md:p-8"
+                  transition={reduced ? { duration: 0 } : { duration: 0.5, delay: 0.1, ease: 'easeOut' }}
+                  className="rounded-lg bg-white/10 p-6 backdrop-blur-sm md:p-8"
                >
                   {submitted ? (
-                     <motion.div
-                        initial={{ scale: 0.9, opacity: 0 }}
-                        animate={{ scale: 1, opacity: 1 }}
-                        className="flex flex-col items-center py-10 text-center"
-                     >
-                        <CheckCircle2 className="mb-4 h-16 w-16 text-[#22C55E]" />
-                        <h3 className="font-display mb-2 text-xl font-bold">Enquiry Submitted!</h3>
-                        <p className="text-white/80">Our team will contact you within 24 hours.</p>
-                        <button
-                           onClick={() => setSubmitted(false)}
-                           className="mt-6 text-sm underline opacity-70 hover:opacity-100"
-                        >
-                           Submit another enquiry
-                        </button>
-                     </motion.div>
+                     <SuccessState onReset={() => setSubmitted(false)} />
                   ) : (
                      <>
                         <h3 className="font-display mb-6 text-xl font-bold">Quick Enquiry</h3>
-                        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-                           <div>
-                              <Label htmlFor="enq-name" className="text-white/80">
-                                 Full Name *
+                        <form
+                           onSubmit={handleSubmit(onSubmit)}
+                           className="space-y-4"
+                           noValidate
+                        >
+                           {/* Name */}
+                           <div className="space-y-1.5">
+                              <Label htmlFor="enq-name" className="text-white/90">
+                                 Full Name <span aria-hidden="true">*</span>
                               </Label>
                               <Input
                                  id="enq-name"
                                  {...register('name')}
-                                 placeholder="Your name"
-                                 className="mt-1 border-white/20 bg-white/10 text-white placeholder:text-white/40 focus-visible:ring-[#22C55E]"
+                                 placeholder="Your full name"
+                                 autoComplete="name"
+                                 aria-required="true"
+                                 aria-invalid={!!errors.name}
+                                 aria-describedby={errors.name ? 'enq-name-err' : undefined}
+                                 className="border-white/20 bg-white/10 text-white placeholder:text-white/40 focus-visible:ring-[var(--sp-accent)]"
                               />
                               {errors.name && (
-                                 <p className="mt-1 text-xs text-red-300">{errors.name.message}</p>
+                                 <p id="enq-name-err" role="alert" className="text-xs text-red-300">
+                                    {errors.name.message}
+                                 </p>
                               )}
                            </div>
-                           <div>
-                              <Label htmlFor="enq-phone" className="text-white/80">
-                                 Mobile Number *
+
+                           {/* Phone */}
+                           <div className="space-y-1.5">
+                              <Label htmlFor="enq-phone" className="text-white/90">
+                                 Mobile Number <span aria-hidden="true">*</span>
                               </Label>
                               <Input
                                  id="enq-phone"
                                  {...register('phone')}
-                                 placeholder="10-digit mobile"
-                                 className="mt-1 border-white/20 bg-white/10 text-white placeholder:text-white/40 focus-visible:ring-[#22C55E]"
+                                 type="tel"
+                                 placeholder="10-digit mobile number"
+                                 autoComplete="tel"
+                                 inputMode="tel"
+                                 aria-required="true"
+                                 aria-invalid={!!errors.phone}
+                                 aria-describedby={errors.phone ? 'enq-phone-err' : undefined}
+                                 className="border-white/20 bg-white/10 text-white placeholder:text-white/40 focus-visible:ring-[var(--sp-accent)]"
                               />
                               {errors.phone && (
-                                 <p className="mt-1 text-xs text-red-300">{errors.phone.message}</p>
+                                 <p id="enq-phone-err" role="alert" className="text-xs text-red-300">
+                                    {errors.phone.message}
+                                 </p>
                               )}
                            </div>
-                           <div>
-                              <Label className="text-white/80">Class Applying For</Label>
+
+                           {/* Class */}
+                           <div className="space-y-1.5">
+                              <Label className="text-white/90">Class Applying For</Label>
                               <Select onValueChange={(v) => setValue('classApplying', v)}>
-                                 <SelectTrigger className="mt-1 border-white/20 bg-white/10 text-white focus:ring-[#22C55E]">
-                                    <SelectValue placeholder="Select class" />
+                                 <SelectTrigger className="border-white/20 bg-white/10 text-white focus:ring-[var(--sp-accent)]">
+                                    <SelectValue placeholder="Select a class" />
                                  </SelectTrigger>
                                  <SelectContent>
                                     {classes.map((c) => (
-                                       <SelectItem key={c} value={c}>
-                                          {c}
-                                       </SelectItem>
+                                       <SelectItem key={c} value={c}>{c}</SelectItem>
                                     ))}
                                  </SelectContent>
                               </Select>
                            </div>
-                           <div>
-                              <Label htmlFor="enq-msg" className="text-white/80">
-                                 Message (optional)
+
+                           {/* Message */}
+                           <div className="space-y-1.5">
+                              <Label htmlFor="enq-msg" className="text-white/90">
+                                 Message <span className="font-normal opacity-60">(optional)</span>
                               </Label>
                               <Textarea
                                  id="enq-msg"
                                  {...register('message')}
-                                 placeholder="Any questions or requirements..."
-                                 className="mt-1 h-20 resize-none border-white/20 bg-white/10 text-white placeholder:text-white/40 focus-visible:ring-[#22C55E]"
+                                 placeholder="Any questions or requirements…"
+                                 className="resize-none border-white/20 bg-white/10 text-white placeholder:text-white/40 focus-visible:ring-[var(--sp-accent)]"
+                                 style={{ minHeight: '5rem' }}
                               />
                            </div>
-                           <motion.button
+
+                           <Button
                               type="submit"
                               disabled={loading}
-                              whileHover={{ y: -1, boxShadow: '0 8px 24px rgba(34,197,94,0.35)' }}
-                              whileTap={{ scale: 0.98 }}
-                              className="flex w-full items-center justify-center gap-2 rounded-xl bg-[#22C55E] py-3.5 text-sm font-bold text-white transition-colors hover:bg-[#16a34a] disabled:opacity-70"
+                              variant="accent"
+                              size="lg"
+                              className="w-full"
                            >
                               {loading ? (
                                  <>
-                                    <Loader2 className="h-4 w-4 animate-spin" />
+                                    <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
                                     Submitting…
                                  </>
                               ) : (
                                  'Submit Enquiry'
                               )}
-                           </motion.button>
+                           </Button>
                         </form>
                      </>
                   )}
@@ -218,5 +229,49 @@ export function AdmissionCTA() {
             </div>
          </div>
       </section>
+   )
+}
+
+// ── Calm green success state — no confetti, no gold, just clarity ─────────────
+function SuccessState({ onReset }: { onReset: () => void }) {
+   return (
+      <motion.div
+         initial={{ opacity: 0, scale: 0.96 }}
+         animate={{ opacity: 1, scale: 1 }}
+         transition={{ duration: 0.35, ease: 'easeOut' }}
+         className="flex flex-col items-center py-10 text-center"
+      >
+         {/* Icon ring — composed in green, calm and assured */}
+         <div
+            className={cn(
+               'mb-5 flex h-20 w-20 items-center justify-center rounded-full',
+               'bg-[var(--sp-accent)]/20 ring-4 ring-[var(--sp-accent)]/30'
+            )}
+         >
+            <CheckCircle2 className="h-10 w-10 text-[var(--sp-accent)]" aria-hidden="true" />
+         </div>
+
+         <h3 className="font-display mb-2 text-xl font-bold text-white">
+            Enquiry Submitted
+         </h3>
+         <p className="mb-2 text-white/80">
+            Our admissions team will call you within <strong>24 hours</strong>.
+         </p>
+         <p className="mb-6 flex items-center gap-1.5 text-sm text-white/60">
+            <Phone className="h-3.5 w-3.5" aria-hidden="true" />
+            You can also reach us directly at any time.
+         </p>
+
+         <button
+            onClick={onReset}
+            className={cn(
+               'text-sm text-white/60 underline underline-offset-4',
+               'transition-colors hover:text-white',
+               'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--sp-accent)] focus-visible:rounded'
+            )}
+         >
+            Submit another enquiry
+         </button>
+      </motion.div>
    )
 }
