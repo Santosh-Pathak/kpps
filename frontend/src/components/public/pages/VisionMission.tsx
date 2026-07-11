@@ -2,6 +2,9 @@
 
 import { motion } from 'framer-motion'
 import { Eye, Target, Heart } from 'lucide-react'
+import { SectionHeading } from '@/components/public/shared/SectionHeading'
+import { useReducedMotion } from '@/hooks/useReducedMotion'
+import { cn } from '@/lib/utils'
 
 const cards = [
    {
@@ -9,69 +12,54 @@ const cards = [
       title: 'Our Vision',
       content:
          'To be a centre of excellence that nurtures academically strong, culturally rooted, and globally aware citizens who contribute positively to society.',
-      color: 'bg-sky-50 dark:bg-sky-950 border-sky-200 dark:border-sky-800',
-      iconColor: 'text-sky-600 dark:text-sky-400',
-      iconBg: 'bg-sky-100 dark:bg-sky-900',
    },
    {
       icon: Target,
       title: 'Our Mission',
       content:
          'To provide a safe, stimulating, and inclusive learning environment that fosters intellectual curiosity, moral integrity, and a lifelong love for learning in every student.',
-      color: 'bg-amber-50 dark:bg-amber-950 border-amber-200 dark:border-amber-800',
-      iconColor: 'text-amber-600 dark:text-amber-400',
-      iconBg: 'bg-amber-100 dark:bg-amber-900',
    },
    {
       icon: Heart,
       title: 'Our Values',
       content:
          'Integrity, empathy, excellence, inclusion, and innovation. We believe every child is gifted, and our role is to discover and nurture that gift.',
-      color: 'bg-rose-50 dark:bg-rose-950 border-rose-200 dark:border-rose-800',
-      iconColor: 'text-rose-600 dark:text-rose-400',
-      iconBg: 'bg-rose-100 dark:bg-rose-900',
    },
 ]
 
 export function VisionMission() {
+   const reduced = useReducedMotion()
+
    return (
-      <section className="section-pad">
+      <section className="section-pad bg-[var(--sp-bg)]">
          <div className="container-kpps">
-            <motion.div
-               initial={{ opacity: 0, y: 20 }}
-               whileInView={{ opacity: 1, y: 0 }}
-               viewport={{ once: true }}
-               className="mb-12 text-center"
-            >
-               <h2 className="font-heading mb-3 text-3xl font-bold md:text-4xl">
-                  Vision, Mission & Values
-               </h2>
-               <p className="text-muted-foreground mx-auto max-w-xl">
-                  The principles that guide everything we do at KPPS.
-               </p>
-            </motion.div>
+            <SectionHeading
+               eyebrow="What We Stand For"
+               title="Vision, Mission & Values"
+               description="The principles that guide everything we do at KPPS."
+               className="mb-12"
+            />
 
             <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
                {cards.map((card, i) => (
                   <motion.div
                      key={card.title}
-                     initial={{ opacity: 0, y: 20 }}
+                     initial={reduced ? false : { opacity: 0, y: 20 }}
                      whileInView={{ opacity: 1, y: 0 }}
                      viewport={{ once: true }}
-                     transition={{ delay: i * 0.12 }}
-                     className={`rounded-2xl border p-6 ${card.color}`}
+                     transition={{ delay: i * 0.12, duration: 0.5, ease: 'easeOut' }}
+                     className={cn(
+                        'rounded-lg border border-[var(--sp-border)] bg-[var(--sp-bg-alt)] p-6',
+                        'shadow-[var(--shadow-card,0_2px_16px_rgba(15,81,50,0.06))]'
+                     )}
                   >
-                     <div
-                        className={`h-12 w-12 ${card.iconBg} mb-4 flex items-center justify-center rounded-xl`}
-                     >
-                        <card.icon className={`h-6 w-6 ${card.iconColor}`} />
+                     <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-md bg-[var(--sp-accent-soft)]">
+                        <card.icon className="h-6 w-6 text-[var(--sp-primary)]" aria-hidden="true" />
                      </div>
-                     <h3 className="font-heading mb-3 text-xl font-bold">
+                     <h3 className="font-display mb-3 text-xl font-bold text-[var(--sp-text)]">
                         {card.title}
                      </h3>
-                     <p className="text-muted-foreground leading-relaxed">
-                        {card.content}
-                     </p>
+                     <p className="leading-relaxed text-[var(--sp-text-muted)]">{card.content}</p>
                   </motion.div>
                ))}
             </div>

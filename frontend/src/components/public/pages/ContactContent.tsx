@@ -11,29 +11,34 @@ import { Textarea } from '@/components/ui/textarea'
 import { Label } from '@/components/ui/label'
 import toast from 'react-hot-toast'
 import { LeadsAPI } from '@/services/apis/leads.api'
-import { Phone, Mail, MapPin, Clock } from 'lucide-react'
+import { Phone, Mail, MapPin, Clock, Loader2 } from 'lucide-react'
+import { SectionHeading } from '@/components/public/shared/SectionHeading'
+import { useReducedMotion } from '@/hooks/useReducedMotion'
+import { cn } from '@/lib/utils'
 
 const schema = z.object({
-   name: z.string().min(2, 'Name required'),
-   phone: z.string().regex(/^[6-9]\d{9}$/, 'Valid 10-digit number required'),
+   name: z.string().min(2, 'Full name is required'),
+   phone: z.string().regex(/^[6-9]\d{9}$/, 'Enter a valid 10-digit mobile number'),
    email: z.string().email().optional().or(z.literal('')),
-   subject: z.string().min(2, 'Subject required'),
-   message: z.string().min(10, 'Message too short'),
+   subject: z.string().min(2, 'Subject is required'),
+   message: z.string().min(10, 'Message is too short — please add more detail'),
 })
 
 type FormValues = z.infer<typeof schema>
 
 const contacts = [
-   { role: 'Manager', phone: '+91 00000 00000', icon: Phone },
-   { role: 'Principal', phone: '+91 00000 00001', icon: Phone },
-   { role: 'Office', phone: '+91 00000 00002', icon: Phone },
-   { role: 'Admission Cell', phone: '+91 00000 00003', icon: Phone },
-   { role: 'Transport', phone: '+91 00000 00004', icon: Phone },
-   { role: 'Email', phone: 'info@kpps.edu.in', icon: Mail },
+   { role: 'Manager', value: '+91 00000 00000', icon: Phone, type: 'tel' as const },
+   { role: 'Principal', value: '+91 00000 00001', icon: Phone, type: 'tel' as const },
+   { role: 'Office', value: '+91 00000 00002', icon: Phone, type: 'tel' as const },
+   { role: 'Admission Cell', value: '+91 00000 00003', icon: Phone, type: 'tel' as const },
+   { role: 'Transport', value: '+91 00000 00004', icon: Phone, type: 'tel' as const },
+   { role: 'Email', value: 'info@kpps.edu.in', icon: Mail, type: 'email' as const },
 ]
 
 export function ContactContent() {
+   const reduced = useReducedMotion()
    const [loading, setLoading] = useState(false)
+
    const {
       register,
       handleSubmit,
@@ -45,81 +50,84 @@ export function ContactContent() {
       setLoading(true)
       try {
          await LeadsAPI.createContact(data)
-         toast.success("Message sent!: We'll respond within 24 hours.")
+         toast.success("Message sent! We'll respond within 24 hours.")
          reset()
       } catch {
-         toast.error('Failed to send: Please call us directly.')
+         toast.error('Failed to send. Please call us directly.')
       } finally {
          setLoading(false)
       }
    }
 
    return (
-      <section className="section-pad">
+      <section className="section-pad bg-[var(--sp-bg)]">
          <div className="container-kpps grid gap-12 lg:grid-cols-2">
-            {/* Contact info */}
+
+            {/* ── Contact info ──────────────────────────────────────── */}
             <motion.div
-               initial={{ opacity: 0, x: -20 }}
-               whileInView={{ opacity: 1, x: 0 }}
+               initial={reduced ? false : { opacity: 0, y: 20 }}
+               whileInView={{ opacity: 1, y: 0 }}
                viewport={{ once: true }}
+               transition={reduced ? { duration: 0 } : { duration: 0.45, ease: 'easeOut' }}
             >
-               <h2 className="font-heading mb-6 text-2xl font-bold">
-                  Get in Touch
-               </h2>
+               <SectionHeading
+                  eyebrow="Reach Us"
+                  title="Get in Touch"
+                  align="left"
+                  as="h2"
+                  className="mb-6"
+               />
 
                <div className="mb-8 space-y-3">
                   {contacts.map((c) => (
                      <div
                         key={c.role}
-                        className="bg-muted/50 flex items-center gap-3 rounded-xl p-3"
+                        className="flex items-center gap-3 rounded-lg border border-[var(--sp-border)] bg-[var(--sp-bg-alt)] p-3"
                      >
-                        <div className="bg-navy/10 dark:bg-secondary/20 flex h-9 w-9 shrink-0 items-center justify-center rounded-lg">
-                           <c.icon className="text-navy dark:text-secondary h-4 w-4" />
+                        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md bg-[var(--sp-accent-soft)]">
+                           <c.icon className="h-4 w-4 text-[var(--sp-primary)]" aria-hidden="true" />
                         </div>
                         <div>
-                           <p className="text-muted-foreground text-xs font-semibold">
-                              {c.role}
-                           </p>
-                           {c.role === 'Email' ? (
-                              <a
-                                 href={`mailto:${c.phone}`}
-                                 className="hover:text-primary text-sm font-medium"
-                              >
-                                 {c.phone}
-                              </a>
-                           ) : (
-                              <a
-                                 href={`tel:${c.phone.replace(/\s/g, '')}`}
-                                 className="hover:text-primary text-sm font-medium"
-                              >
-                                 {c.phone}
-                              </a>
-                           )}
+                           <p className="text-xs font-semibold text-[var(--sp-text-muted)]">{c.role}</p>
+                           <a
+                              href={c.type === 'email' ? `mailto:${c.value}` : `tel:${c.value.replace(/\s/g, '')}`}
+                              className={cn(
+                                 'text-sm font-medium text-[var(--sp-text)]',
+                                 'transition-colors hover:text-[var(--sp-accent)]',
+                                 'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)] rounded-sm'
+                              )}
+                           >
+                              {c.value}
+                           </a>
                         </div>
                      </div>
                   ))}
                </div>
 
                <div className="mb-6 flex items-start gap-3">
-                  <MapPin className="text-navy dark:text-secondary mt-0.5 h-5 w-5 shrink-0" />
-                  <address className="text-muted-foreground text-sm not-italic">
-                     123 School Road,
-                     <br />
+                  <MapPin
+                     className="mt-0.5 h-5 w-5 shrink-0 text-[var(--sp-accent)]"
+                     aria-hidden="true"
+                  />
+                  <address className="text-sm not-italic leading-relaxed text-[var(--sp-text-muted)]">
+                     123 School Road,<br />
                      City, State – 000000
                   </address>
                </div>
 
-               <div className="flex items-start gap-3">
-                  <Clock className="text-navy dark:text-secondary mt-0.5 h-5 w-5 shrink-0" />
-                  <div className="text-muted-foreground text-sm">
-                     <p className="text-foreground font-medium">Office Hours</p>
+               <div className="mb-6 flex items-start gap-3">
+                  <Clock
+                     className="mt-0.5 h-5 w-5 shrink-0 text-[var(--sp-accent)]"
+                     aria-hidden="true"
+                  />
+                  <div className="text-sm text-[var(--sp-text-muted)]">
+                     <p className="font-medium text-[var(--sp-text)]">Office Hours</p>
                      <p>Mon – Sat: 9:00 AM – 3:00 PM</p>
-                     <p>Sunday & Holidays: Closed</p>
+                     <p>Sunday &amp; Holidays: Closed</p>
                   </div>
                </div>
 
-               {/* Map */}
-               <div className="border-border mt-6 aspect-video overflow-hidden rounded-xl border">
+               <div className="overflow-hidden rounded-lg border border-[var(--sp-border)] aspect-video">
                   <iframe
                      src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3153.8354345993858!2d144.95373531531614!3d-37.816279742021345!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMznCsDQ4JzU4LjYiUyAxNDTCsDU3JzEzLjUiRQ!5e0!3m2!1sen!2sin!4v1234567890"
                      className="h-full w-full"
@@ -127,99 +135,131 @@ export function ContactContent() {
                      allowFullScreen
                      loading="lazy"
                      referrerPolicy="no-referrer-when-downgrade"
-                     title="School location"
+                     title="School location on Google Maps"
                   />
                </div>
             </motion.div>
 
-            {/* Contact form */}
+            {/* ── Contact form ──────────────────────────────────────── */}
             <motion.div
-               initial={{ opacity: 0, x: 20 }}
-               whileInView={{ opacity: 1, x: 0 }}
+               initial={reduced ? false : { opacity: 0, y: 20 }}
+               whileInView={{ opacity: 1, y: 0 }}
                viewport={{ once: true }}
+               transition={reduced ? { duration: 0 } : { duration: 0.45, delay: 0.1, ease: 'easeOut' }}
             >
-               <h2 className="font-heading mb-6 text-2xl font-bold">
-                  Send a Message
-               </h2>
-               <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-                  <div>
-                     <Label htmlFor="c-name">Full Name *</Label>
+               <SectionHeading
+                  eyebrow="Message Us"
+                  title="Send a Message"
+                  align="left"
+                  as="h2"
+                  className="mb-6"
+               />
+
+               <form onSubmit={handleSubmit(onSubmit)} className="space-y-4" noValidate>
+                  <div className="space-y-1.5">
+                     <Label htmlFor="c-name">Full Name <span aria-hidden="true">*</span></Label>
                      <Input
                         id="c-name"
                         {...register('name')}
                         placeholder="Your name"
-                        className="mt-1"
+                        autoComplete="name"
+                        aria-required="true"
+                        aria-invalid={!!errors.name}
+                        aria-describedby={errors.name ? 'c-name-err' : undefined}
                      />
                      {errors.name && (
-                        <p className="text-destructive mt-1 text-xs">
+                        <p id="c-name-err" role="alert" className="text-xs text-red-500 dark:text-red-400">
                            {errors.name.message}
                         </p>
                      )}
                   </div>
+
                   <div className="grid gap-4 sm:grid-cols-2">
-                     <div>
-                        <Label htmlFor="c-phone">Phone *</Label>
+                     <div className="space-y-1.5">
+                        <Label htmlFor="c-phone">Phone <span aria-hidden="true">*</span></Label>
                         <Input
                            id="c-phone"
                            {...register('phone')}
-                           placeholder="Mobile number"
-                           className="mt-1"
+                           type="tel"
+                           placeholder="10-digit number"
+                           inputMode="tel"
+                           aria-required="true"
+                           aria-invalid={!!errors.phone}
+                           aria-describedby={errors.phone ? 'c-phone-err' : undefined}
                         />
                         {errors.phone && (
-                           <p className="text-destructive mt-1 text-xs">
+                           <p id="c-phone-err" role="alert" className="text-xs text-red-500 dark:text-red-400">
                               {errors.phone.message}
                            </p>
                         )}
                      </div>
-                     <div>
-                        <Label htmlFor="c-email">Email</Label>
+                     <div className="space-y-1.5">
+                        <Label htmlFor="c-email">Email <span className="font-normal text-[var(--sp-text-muted)]">(optional)</span></Label>
                         <Input
                            id="c-email"
                            {...register('email')}
                            type="email"
-                           placeholder="Optional"
-                           className="mt-1"
+                           placeholder="your@email.com"
+                           autoComplete="email"
                         />
                      </div>
                   </div>
-                  <div>
-                     <Label htmlFor="c-subject">Subject *</Label>
+
+                  <div className="space-y-1.5">
+                     <Label htmlFor="c-subject">Subject <span aria-hidden="true">*</span></Label>
                      <Input
                         id="c-subject"
                         {...register('subject')}
                         placeholder="What is this regarding?"
-                        className="mt-1"
+                        aria-required="true"
+                        aria-invalid={!!errors.subject}
+                        aria-describedby={errors.subject ? 'c-subject-err' : undefined}
                      />
                      {errors.subject && (
-                        <p className="text-destructive mt-1 text-xs">
+                        <p id="c-subject-err" role="alert" className="text-xs text-red-500 dark:text-red-400">
                            {errors.subject.message}
                         </p>
                      )}
                   </div>
-                  <div>
-                     <Label htmlFor="c-message">Message *</Label>
+
+                  <div className="space-y-1.5">
+                     <Label htmlFor="c-message">Message <span aria-hidden="true">*</span></Label>
                      <Textarea
                         id="c-message"
                         {...register('message')}
-                        placeholder="Type your message here..."
-                        className="mt-1 h-32 resize-none"
+                        placeholder="Type your message here…"
+                        className="resize-none"
+                        style={{ minHeight: '8rem' }}
+                        aria-required="true"
+                        aria-invalid={!!errors.message}
+                        aria-describedby={errors.message ? 'c-msg-err' : undefined}
                      />
                      {errors.message && (
-                        <p className="text-destructive mt-1 text-xs">
+                        <p id="c-msg-err" role="alert" className="text-xs text-red-500 dark:text-red-400">
                            {errors.message.message}
                         </p>
                      )}
                   </div>
+
                   <Button
                      type="submit"
+                     variant="primary"
                      size="lg"
                      className="w-full"
                      disabled={loading}
                   >
-                     {loading ? 'Sending…' : 'Send Message'}
+                     {loading ? (
+                        <>
+                           <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
+                           Sending…
+                        </>
+                     ) : (
+                        'Send Message'
+                     )}
                   </Button>
                </form>
             </motion.div>
+
          </div>
       </section>
    )

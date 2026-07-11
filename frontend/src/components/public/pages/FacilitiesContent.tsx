@@ -13,6 +13,8 @@ import {
    Camera,
    Wifi,
 } from 'lucide-react'
+import { useReducedMotion } from '@/hooks/useReducedMotion'
+import { cn } from '@/lib/utils'
 
 const facilities = [
    {
@@ -78,26 +80,33 @@ const facilities = [
 ]
 
 export function FacilitiesContent() {
+   const reduced = useReducedMotion()
+
    return (
-      <section className="section-pad">
-         <div className="container-kpps grid grid-cols-1 gap-6 md:grid-cols-2">
-            {facilities.map((f, i) => (
+      <section className="section-pad bg-[var(--sp-bg)]">
+         <div className="container-kpps grid grid-cols-1 gap-5 md:grid-cols-2">
+            {facilities.map((f) => (
                <motion.div
                   key={f.title}
-                  initial={{ opacity: 0, y: 16 }}
+                  initial={reduced ? false : { opacity: 0, y: 16 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
-                  transition={{ delay: (i % 2) * 0.1 }}
-                  className="bg-muted/50 flex gap-5 rounded-xl p-6 transition-shadow hover:shadow-md"
+                  transition={{ duration: 0.45, ease: 'easeOut' }}
+                  className={cn(
+                     'flex gap-5 rounded-lg border border-[var(--sp-border)] bg-[var(--sp-bg-alt)] p-6',
+                     'shadow-[var(--shadow-card,0_2px_16px_rgba(15,81,50,0.06))]',
+                     'transition-shadow duration-200',
+                     'hover:shadow-[var(--shadow-elevated,0_8px_32px_rgba(15,81,50,0.12))]'
+                  )}
                >
-                  <div className="bg-navy/10 dark:bg-secondary/20 flex h-12 w-12 shrink-0 items-center justify-center rounded-xl">
-                     <f.icon className="text-navy dark:text-secondary h-6 w-6" />
+                  <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-md bg-[var(--sp-accent-soft)]">
+                     <f.icon className="h-6 w-6 text-[var(--sp-primary)]" aria-hidden="true" />
                   </div>
                   <div>
-                     <h3 className="font-heading mb-2 text-base font-bold">
+                     <h3 className="font-display mb-2 text-base font-bold text-[var(--sp-text)]">
                         {f.title}
                      </h3>
-                     <p className="text-muted-foreground text-sm leading-relaxed">
+                     <p className="text-sm leading-relaxed text-[var(--sp-text-muted)]">
                         {f.description}
                      </p>
                   </div>

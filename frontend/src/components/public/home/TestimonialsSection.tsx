@@ -1,71 +1,139 @@
 'use client'
 
+import Image from 'next/image'
+import { useState, useEffect, useCallback } from 'react'
 import { motion } from 'framer-motion'
+import useEmblaCarousel from 'embla-carousel-react'
 import { Quote } from 'lucide-react'
-
-const testimonials = [
-   {
-      name: 'Priya Sharma',
-      role: 'Parent — Class IX',
-      quote: "KPPS has been a transformative experience for my daughter. The teachers genuinely care about every child's progress.",
-   },
-   {
-      name: 'Rahul Verma',
-      role: 'Alumni 2023',
-      quote: 'The foundation built at KPPS helped me score 97% in boards and secure admission in a top engineering college.',
-   },
-   {
-      name: 'Meena Gupta',
-      role: 'Parent — Class VI',
-      quote: 'The smart classrooms and activity-based learning have made my son love going to school every morning.',
-   },
-]
+import { testimonials } from '@/lib/dummy-data'
+import { SectionHeading } from '@/components/public/shared/SectionHeading'
+import { useReducedMotion } from '@/hooks/useReducedMotion'
+import { cn } from '@/lib/utils'
 
 export function TestimonialsSection() {
-   return (
-      <section className="section-pad bg-muted/30">
-         <div className="container-kpps">
-            <motion.div
-               initial={{ opacity: 0, y: 20 }}
-               whileInView={{ opacity: 1, y: 0 }}
-               viewport={{ once: true }}
-               className="mb-12 text-center"
-            >
-               <p className="text-secondary mb-2 text-sm font-semibold tracking-widest uppercase">
-                  Testimonials
-               </p>
-               <h2 className="font-heading mb-3 text-3xl font-bold md:text-4xl">
-                  What Parents & Alumni Say
-               </h2>
-            </motion.div>
+   const reduced = useReducedMotion()
+   const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true })
+   const [activeIndex, setActiveIndex] = useState(0)
 
-            <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
-               {testimonials.map((t, i) => (
-                  <motion.div
-                     key={t.name}
-                     initial={{ opacity: 0, y: 20 }}
-                     whileInView={{ opacity: 1, y: 0 }}
-                     viewport={{ once: true }}
-                     transition={{ delay: i * 0.1 }}
-                     className="bg-background border-border rounded-2xl border p-6 shadow-sm"
-                  >
-                     <Quote className="text-secondary/40 mb-4 h-8 w-8" />
-                     <p className="text-muted-foreground mb-6 leading-relaxed italic">
-                        &ldquo;{t.quote}&rdquo;
-                     </p>
-                     <div className="flex items-center gap-3">
-                        <div className="bg-navy/10 font-heading text-navy flex h-10 w-10 items-center justify-center rounded-full font-bold">
-                           {t.name[0]}
+   const scrollTo = useCallback(
+      (index: number) => emblaApi?.scrollTo(index),
+      [emblaApi]
+   )
+
+   useEffect(() => {
+      if (!emblaApi) return
+      const onSelect = () => setActiveIndex(emblaApi.selectedScrollSnap())
+      emblaApi.on('select', onSelect)
+
+      // Autoplay — paused when user prefers reduced motion
+      let timer: ReturnType<typeof setInterval> | null = null
+      if (!reduced) {
+         timer = setInterval(() => emblaApi.scrollNext(), 5000)
+      }
+
+      return () => {
+         if (timer) clearInterval(timer)
+         emblaApi.off('select', onSelect)
+      }
+   }, [emblaApi, reduced])
+
+   return (
+      <section
+         className="section-pad bg-[var(--sp-bg-alt)]"
+         aria-label="Parent and alumni testimonials"
+      >
+         <div className="container-kpps">
+            <SectionHeading
+               eyebrow="Testimonials"
+               title="What Parents & Alumni Say"
+            />
+
+            <div className="relative mx-auto max-w-3xl">
+               {/* Large decorative quote mark */}
+               <Quote
+                  className="absolute -top-6 -left-4 h-16 w-16 text-[var(--sp-accent-soft)]"
+                  aria-hidden="true"
+               />
+
+               {/* Carousel */}
+               <div
+                  className="overflow-hidden"
+                  ref={emblaRef}
+                  aria-live={reduced ? 'polite' : 'off'}
+               >
+                  <div className="flex" role="list">
+                     {testimonials.map((t, i) => (
+                        <div
+                           key={t.name}
+                           className="min-w-full px-4 py-2 text-center"
+                           role="listitem"
+                           aria-label={`Testimonial from ${t.name}`}
+                        >
+                           <motion.div
+                              initial={reduced ? false : { opacity: 0 }}
+                              animate={{ opacity: activeIndex === i ? 1 : 0 }}
+                              transition={reduced ? { duration: 0 } : { duration: 0.5 }}
+                           >
+                              <blockquote
+                                 className={cn(
+                                    'font-display mb-8 text-xl font-semibold italic leading-relaxed',
+                                    'text-[var(--sp-text)]'
+                                 )}
+                              >
+                                 &ldquo;{t.quote}&rdquo;
+                              </blockquote>
+
+                              <div className="flex items-center justify-center gap-3">
+                                 <div
+                                    className={cn(
+                                       'relative h-12 w-12 overflow-hidden rounded-full',
+                                       'border-2 border-[var(--sp-accent-soft)]'
+                                    )}
+                                 >
+                                    <Image
+                                       src={t.avatar}
+                                       alt={`Photo of ${t.name}`}
+                                       fill
+                                       className="object-cover"
+                                       sizes="48px"
+                                    />
+                                 </div>
+                                 <div className="text-left">
+                                    <p className="text-sm font-semibold text-[var(--sp-text)]">
+                                       {t.name}
+                                    </p>
+                                    <p className="text-xs text-[var(--sp-text-muted)]">
+                                       {t.role}
+                                    </p>
+                                 </div>
+                              </div>
+                           </motion.div>
                         </div>
-                        <div>
-                           <p className="text-sm font-semibold">{t.name}</p>
-                           <p className="text-muted-foreground text-xs">
-                              {t.role}
-                           </p>
-                        </div>
-                     </div>
-                  </motion.div>
-               ))}
+                     ))}
+                  </div>
+               </div>
+
+               {/* Dot nav — fully keyboard accessible */}
+               <div
+                  className="mt-8 flex justify-center gap-2"
+                  role="tablist"
+                  aria-label="Testimonial navigation"
+               >
+                  {testimonials.map((t, i) => (
+                     <button
+                        key={i}
+                        role="tab"
+                        aria-selected={activeIndex === i}
+                        aria-label={`Show testimonial from ${t.name}`}
+                        onClick={() => scrollTo(i)}
+                        className={cn(
+                           'h-2 rounded-full bg-[var(--sp-accent)] transition-all duration-300',
+                           'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--sp-accent)] focus-visible:ring-offset-2',
+                           activeIndex === i ? 'w-6 opacity-100' : 'w-2 opacity-35'
+                        )}
+                     />
+                  ))}
+               </div>
             </div>
          </div>
       </section>

@@ -1,198 +1,244 @@
 'use client'
 
-import { useEffect, useRef } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
+import Image from 'next/image'
 import Link from 'next/link'
-import { motion } from 'framer-motion'
+import { motion, AnimatePresence } from 'framer-motion'
+import useEmblaCarousel from 'embla-carousel-react'
+import { ChevronLeft, ChevronRight, ChevronDown } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { ChevronLeft, ChevronRight } from 'lucide-react'
+import { heroSlides } from '@/lib/dummy-data'
+import { useReducedMotion } from '@/hooks/useReducedMotion'
+import { cn } from '@/lib/utils'
 
-const slides = [
-   {
-      id: 1,
-      headline: 'Admissions Open 2025–26',
-      subtext:
-         "Shape your child's future with CBSE excellence, expert faculty, and world-class facilities.",
-      cta: 'Apply for Admission',
-      ctaHref: '/admissions',
-      bg: 'from-navy-900/80 via-navy-800/60 to-transparent',
-      color: 'from-[#1e3a5f] to-[#2d5a9e]',
-   },
-   {
-      id: 2,
-      headline: 'Building Global Citizens',
-      subtext:
-         'Activities, sports, cultural events and educational trips that shape well-rounded individuals.',
-      cta: 'Explore Activities',
-      ctaHref: '/activities',
-      bg: 'from-black/70 via-black/40 to-transparent',
-      color: 'from-[#1a2b4a] to-[#1e3a5f]',
-   },
-   {
-      id: 3,
-      headline: 'Excellence in Academics',
-      subtext:
-         'Consistent board toppers and 100% pass rate across Science, Commerce & Arts streams.',
-      cta: 'View Achievements',
-      ctaHref: '/achievements',
-      bg: 'from-navy-900/80 via-navy-800/60 to-transparent',
-      color: 'from-[#1e3a5f] to-[#4a2080]',
-   },
-]
+// Word-by-word headline entrance — skipped entirely when reduced motion is on
+const HEADLINE_WORDS_VARIANT = {
+   hidden: {},
+   visible: { transition: { staggerChildren: 0.08 } },
+}
+const WORD_VARIANT = {
+   hidden: { opacity: 0, y: 32 },
+   visible: { opacity: 1, y: 0, transition: { duration: 0.45, ease: 'easeOut' } },
+}
 
 export function HeroSlider() {
-   const swiperRef = useRef<HTMLDivElement>(null)
-   const currentRef = useRef(0)
+   const reduced = useReducedMotion()
+   const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true, duration: 40 })
+   const [activeIndex, setActiveIndex] = useState(0)
    const timerRef = useRef<ReturnType<typeof setInterval> | null>(null)
 
-   const goTo = (index: number) => {
-      const slides =
-         swiperRef.current?.querySelectorAll<HTMLElement>('[data-slide]')
-      const dots = document.querySelectorAll<HTMLElement>('[data-dot]')
-      if (!slides) return
-      slides.forEach((s, i) => {
-         s.style.opacity = i === index ? '1' : '0'
-         s.style.zIndex = i === index ? '10' : '0'
-      })
-      dots.forEach((d, i) => {
-         d.setAttribute('data-active', String(i === index))
-      })
-      currentRef.current = index
-   }
+   const next = useCallback(() => emblaApi?.scrollNext(), [emblaApi])
+   const prev = useCallback(() => emblaApi?.scrollPrev(), [emblaApi])
 
-   const next = () => goTo((currentRef.current + 1) % slides.length)
-   const prev = () =>
-      goTo((currentRef.current - 1 + slides.length) % slides.length)
+   const startTimer = useCallback(() => {
+      if (timerRef.current) clearInterval(timerRef.current)
+      timerRef.current = setInterval(() => emblaApi?.scrollNext(), 5500)
+   }, [emblaApi])
 
-   useEffect(() => {
-      timerRef.current = setInterval(next, 5000)
-      return () => {
-         if (timerRef.current) clearInterval(timerRef.current)
-      }
+   const stopTimer = useCallback(() => {
+      if (timerRef.current) clearInterval(timerRef.current)
    }, [])
 
-   const pauseTimer = () => {
-      if (timerRef.current) clearInterval(timerRef.current)
-   }
-   const resumeTimer = () => {
-      timerRef.current = setInterval(next, 5000)
-   }
+   useEffect(() => {
+      if (!emblaApi) return
+      const onSelect = () => setActiveIndex(emblaApi.selectedScrollSnap())
+      emblaApi.on('select', onSelect)
+      // Autoplay skipped when user prefers reduced motion
+      if (!reduced) startTimer()
+      return () => {
+         stopTimer()
+         emblaApi.off('select', onSelect)
+      }
+   }, [emblaApi, startTimer, stopTimer, reduced])
 
    return (
       <section
-         className="relative h-[92vh] max-h-[900px] min-h-[520px] overflow-hidden"
-         onMouseEnter={pauseTimer}
-         onMouseLeave={resumeTimer}
-         onTouchStart={pauseTimer}
-         onTouchEnd={resumeTimer}
-         aria-label="Hero slider"
+         className="relative min-h-[90vh] overflow-hidden"
+         onMouseEnter={stopTimer}
+         onMouseLeave={() => { if (!reduced) startTimer() }}
+         aria-label="Hero image slideshow"
+         aria-roledescription="carousel"
       >
-         <div ref={swiperRef} className="relative h-full w-full">
-            {slides.map((slide, i) => (
-               <div
-                  key={slide.id}
-                  data-slide={i}
-                  className="absolute inset-0 transition-opacity duration-700"
-                  style={{ opacity: i === 0 ? 1 : 0, zIndex: i === 0 ? 10 : 0 }}
-               >
-                  {/* Background gradient (replaces real photo until admin uploads) */}
+         <div className="h-full w-full" ref={emblaRef}>
+            <div className="flex h-full" aria-live="off">
+               {heroSlides.map((slide, i) => (
                   <div
-                     className={`absolute inset-0 bg-gradient-to-br ${slide.color}`}
-                  />
-                  {/* Pattern overlay */}
-                  <div
-                     className="absolute inset-0 opacity-10"
-                     style={{
-                        backgroundImage:
-                           'radial-gradient(circle, rgba(255,255,255,0.3) 1px, transparent 1px)',
-                        backgroundSize: '32px 32px',
-                     }}
-                  />
+                     key={slide.id}
+                     className="relative min-h-[90vh] min-w-full flex-none"
+                     role="group"
+                     aria-roledescription="slide"
+                     aria-label={`${i + 1} of ${heroSlides.length}: ${slide.headline}`}
+                  >
+                     {/* Background image with Ken Burns only when motion is OK */}
+                     <div className="absolute inset-0 overflow-hidden">
+                        <Image
+                           src={slide.image}
+                           alt=""
+                           fill
+                           priority={i === 0}
+                           className={cn(
+                              'object-cover',
+                              !reduced && activeIndex === i && 'animate-[kenBurns_8s_ease-in-out_forwards]'
+                           )}
+                           sizes="100vw"
+                        />
+                        {/* Gradient overlay — dark left, light right for typography legibility */}
+                        <div className="absolute inset-0 bg-gradient-to-r from-[var(--sp-primary-dark)]/85 via-[var(--sp-primary-dark)]/55 to-[var(--sp-primary-dark)]/15" />
+                     </div>
 
-                  {/* Content */}
-                  <div className="relative z-10 flex h-full items-center">
-                     <div className="container-kpps">
-                        <motion.div
-                           initial={{ opacity: 0, y: 30 }}
-                           animate={{ opacity: 1, y: 0 }}
-                           transition={{ duration: 0.7, delay: 0.1 }}
-                           className="max-w-2xl"
-                        >
-                           <div className="mb-4 flex items-center gap-2">
-                              <span className="bg-secondary/90 text-navy rounded-full px-3 py-1 text-xs font-semibold">
-                                 CBSE Affiliated
-                              </span>
-                              <span className="rounded-full bg-white/20 px-3 py-1 text-xs text-white">
-                                 Since 2001
-                              </span>
-                           </div>
-                           <h1 className="font-heading mb-4 text-4xl leading-tight font-extrabold text-white sm:text-5xl md:text-6xl">
-                              {slide.headline}
-                           </h1>
-                           <p className="mb-8 text-lg leading-relaxed text-white/85 md:text-xl">
-                              {slide.subtext}
-                           </p>
-                           <div className="flex flex-wrap gap-3">
-                              <Link href={slide.ctaHref}>
-                                 <Button variant="cta" size="lg">
-                                    {slide.cta}
-                                 </Button>
-                              </Link>
-                              <Link href="/contact">
-                                 <Button
-                                    variant="outline"
-                                    size="lg"
-                                    className="hover:text-navy border-white text-white hover:bg-white"
+                     {/* Slide content */}
+                     <div className="relative z-10 flex min-h-[90vh] items-center">
+                        <div className="container-kpps py-24 md:py-32">
+                           <AnimatePresence mode="wait">
+                              {activeIndex === i && (
+                                 <motion.div
+                                    key={`content-${i}`}
+                                    initial={reduced ? false : 'hidden'}
+                                    animate="visible"
+                                    exit={{ opacity: 0, transition: { duration: 0.25 } }}
+                                    variants={HEADLINE_WORDS_VARIANT}
+                                    className="max-w-2xl"
                                  >
-                                    Contact Us
-                                 </Button>
-                              </Link>
-                           </div>
-                        </motion.div>
+                                    {/* Eyebrow */}
+                                    <motion.p
+                                       variants={reduced ? {} : WORD_VARIANT}
+                                       className="kpps-eyebrow mb-4"
+                                    >
+                                       CBSE Affiliated · Est. 2001
+                                    </motion.p>
+
+                                    {/* Headline — Fraunces italic, word-by-word on motion OK */}
+                                    <motion.h1
+                                       variants={HEADLINE_WORDS_VARIANT}
+                                       className="kpps-h1 font-display mb-5 font-bold italic text-white"
+                                       aria-label={slide.headline}
+                                    >
+                                       {slide.headline.split(' ').map((word, wi) => (
+                                          <motion.span
+                                             key={wi}
+                                             variants={reduced ? {} : WORD_VARIANT}
+                                             className="mr-3 inline-block"
+                                          >
+                                             {word}
+                                          </motion.span>
+                                       ))}
+                                    </motion.h1>
+
+                                    {/* Subtext */}
+                                    <motion.p
+                                       variants={reduced ? {} : WORD_VARIANT}
+                                       className="mb-9 max-w-xl text-lg leading-relaxed text-white/80"
+                                    >
+                                       {slide.subtext}
+                                    </motion.p>
+
+                                    {/* CTAs — Button asChild removes <Link><button> nesting */}
+                                    <motion.div
+                                       variants={reduced ? {} : WORD_VARIANT}
+                                       className="flex flex-wrap gap-3"
+                                    >
+                                       <Button
+                                          variant="accent"
+                                          size="lg"
+                                          className="rounded-full"
+                                          asChild
+                                       >
+                                          <Link href={slide.primaryCta.href}>
+                                             {slide.primaryCta.label}
+                                          </Link>
+                                       </Button>
+
+                                       <Button
+                                          variant="ghost"
+                                          size="lg"
+                                          className="rounded-full border border-white/60 text-white hover:bg-white/10 hover:text-white"
+                                          asChild
+                                       >
+                                          <Link href={slide.secondaryCta.href}>
+                                             {slide.secondaryCta.label}
+                                          </Link>
+                                       </Button>
+                                    </motion.div>
+                                 </motion.div>
+                              )}
+                           </AnimatePresence>
+                        </div>
                      </div>
                   </div>
-               </div>
-            ))}
+               ))}
+            </div>
          </div>
 
-         {/* Controls */}
+         {/* ── Prev / Next controls ──────────────────────────────────────── */}
          <button
             onClick={prev}
-            className="absolute top-1/2 left-4 z-20 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-white/20 text-white transition-colors hover:bg-white/40"
+            className={cn(
+               'absolute left-4 top-1/2 z-20 -translate-y-1/2',
+               'flex h-11 w-11 items-center justify-center rounded-full',
+               'bg-white/15 text-white backdrop-blur-sm',
+               'transition-colors duration-150 hover:bg-white/30',
+               'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-transparent'
+            )}
             aria-label="Previous slide"
          >
-            <ChevronLeft className="h-5 w-5" />
+            <ChevronLeft className="h-5 w-5" aria-hidden="true" />
          </button>
          <button
             onClick={next}
-            className="absolute top-1/2 right-4 z-20 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-white/20 text-white transition-colors hover:bg-white/40"
+            className={cn(
+               'absolute right-4 top-1/2 z-20 -translate-y-1/2',
+               'flex h-11 w-11 items-center justify-center rounded-full',
+               'bg-white/15 text-white backdrop-blur-sm',
+               'transition-colors duration-150 hover:bg-white/30',
+               'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-transparent'
+            )}
             aria-label="Next slide"
          >
-            <ChevronRight className="h-5 w-5" />
+            <ChevronRight className="h-5 w-5" aria-hidden="true" />
          </button>
 
-         {/* Dots */}
-         <div className="absolute bottom-6 left-1/2 z-20 flex -translate-x-1/2 gap-2">
-            {slides.map((_, i) => (
+         {/* ── Slide dots ───────────────────────────────────────────────── */}
+         <div
+            className="absolute bottom-14 left-1/2 z-20 flex -translate-x-1/2 gap-2"
+            role="tablist"
+            aria-label="Slide navigation"
+         >
+            {heroSlides.map((slide, i) => (
                <button
                   key={i}
-                  data-dot={i}
-                  onClick={() => goTo(i)}
-                  className="h-2.5 w-2.5 rounded-full bg-white/50 transition-all duration-300 data-[active=true]:w-6 data-[active=true]:bg-white"
-                  aria-label={`Go to slide ${i + 1}`}
-                  data-active={i === 0}
+                  role="tab"
+                  aria-selected={activeIndex === i}
+                  aria-label={`Slide ${i + 1}: ${slide.headline}`}
+                  onClick={() => emblaApi?.scrollTo(i)}
+                  className={cn(
+                     'h-2 rounded-full bg-[var(--sp-accent)] transition-all duration-300',
+                     'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-1',
+                     activeIndex === i ? 'w-7 opacity-100' : 'w-2 opacity-50'
+                  )}
                />
             ))}
          </div>
 
-         {/* Bottom wave */}
-         <div className="absolute right-0 bottom-0 left-0 z-10">
+         {/* ── Scroll-down hint (hidden when reduced motion) ────────────── */}
+         {!reduced && (
+            <motion.div
+               className="absolute bottom-6 left-1/2 z-20 -translate-x-1/2 text-white/60"
+               animate={{ y: [0, 8, 0] }}
+               transition={{ repeat: Infinity, duration: 1.8, ease: 'easeInOut' }}
+               aria-hidden="true"
+            >
+               <ChevronDown className="h-6 w-6" />
+            </motion.div>
+         )}
+
+         {/* ── Wave transition to section below ─────────────────────────── */}
+         <div className="absolute right-0 bottom-0 left-0 z-10 leading-none" aria-hidden="true">
             <svg
                viewBox="0 0 1440 60"
-               className="fill-background w-full"
                preserveAspectRatio="none"
-               height="40"
+               className="h-10 w-full fill-[var(--sp-bg)]"
             >
-               <path d="M0,60 C360,0 1080,0 1440,60 L1440,60 L0,60 Z" />
+               <path d="M0,40 C360,0 1080,0 1440,40 L1440,60 L0,60 Z" />
             </svg>
          </div>
       </section>

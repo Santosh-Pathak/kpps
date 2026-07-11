@@ -1,19 +1,21 @@
 import type { Metadata } from 'next'
-import { Baloo_2, Inter } from 'next/font/google'
+import { Fraunces, Plus_Jakarta_Sans } from 'next/font/google'
 import { Toaster } from 'react-hot-toast'
 import './globals.css'
 import { ThemeProvider } from '@/contexts/ThemeContext'
 import { AppProvider } from '@/providers/AppProvider'
 
-const baloo = Baloo_2({
-   variable: '--font-baloo',
+const fraunces = Fraunces({
+   variable: '--font-fraunces',
    subsets: ['latin'],
-   weight: ['400', '500', '600', '700', '800'],
+   weight: ['300', '400', '600', '700', '900'],
+   style: ['normal', 'italic'],
 })
 
-const inter = Inter({
-   variable: '--font-inter',
+const plusJakarta = Plus_Jakarta_Sans({
+   variable: '--font-plus-jakarta',
    subsets: ['latin'],
+   weight: ['400', '500', '600', '700', '800'],
 })
 
 export const metadata: Metadata = {
@@ -32,8 +34,8 @@ export default function RootLayout({
 }>) {
    return (
       <html lang="en">
-         <body className={`${baloo.variable} ${inter.variable} antialiased`}>
-            <ThemeProvider>
+         <body className={`${fraunces.variable} ${plusJakarta.variable} antialiased`} style={{ fontFamily: 'var(--font-plus-jakarta), system-ui, sans-serif' }}>
+            <ThemeProvider enableDynamicThemes={false}>
                <AppProvider>
                   {children}
                   <Toaster
@@ -41,19 +43,25 @@ export default function RootLayout({
                      toastOptions={{
                         duration: 4000,
                         style: {
-                           background: '#363636',
-                           color: '#fff',
+                           background: '#0B1F17',
+                           color: '#F0FBF6',
+                           borderRadius: '0.625rem',
+                           boxShadow: '0 4px 24px rgba(15,81,50,0.18)',
+                           fontSize: '0.875rem',
                         },
                         success: {
                            duration: 3000,
                            style: {
-                              background: '#10b981',
+                              background: '#0F5132',
+                              color: '#ffffff',
                            },
+                           iconTheme: { primary: '#22C55E', secondary: '#ffffff' },
                         },
                         error: {
                            duration: 5000,
                            style: {
-                              background: '#ef4444',
+                              background: '#7f1d1d',
+                              color: '#ffffff',
                            },
                         },
                      }}

@@ -1,6 +1,8 @@
 'use client'
 
 import { motion } from 'framer-motion'
+import { useReducedMotion } from '@/hooks/useReducedMotion'
+import { cn } from '@/lib/utils'
 
 const stages = [
    {
@@ -64,33 +66,15 @@ const stages = [
       streams: [
          {
             name: 'Science — Medical',
-            subjects: [
-               'Physics',
-               'Chemistry',
-               'Biology',
-               'English Core',
-               '+ Math / Computer / PE',
-            ],
+            subjects: ['Physics', 'Chemistry', 'Biology', 'English Core', '+ Math / Computer / PE'],
          },
          {
             name: 'Science — Non-Medical',
-            subjects: [
-               'Physics',
-               'Chemistry',
-               'Mathematics',
-               'English Core',
-               '+ CS / PE',
-            ],
+            subjects: ['Physics', 'Chemistry', 'Mathematics', 'English Core', '+ CS / PE'],
          },
          {
             name: 'Commerce',
-            subjects: [
-               'Accountancy',
-               'Business Studies',
-               'Economics',
-               'English Core',
-               '+ Math / IP',
-            ],
+            subjects: ['Accountancy', 'Business Studies', 'Economics', 'English Core', '+ Math / IP'],
          },
          {
             name: 'Arts / Humanities',
@@ -109,22 +93,27 @@ const stages = [
 ]
 
 export function AcademicsContent() {
+   const reduced = useReducedMotion()
+
    return (
-      <section className="section-pad">
-         <div className="container-kpps space-y-10">
-            {stages.map((stage, i) => (
+      <section className="section-pad bg-[var(--sp-bg)]">
+         <div className="container-kpps space-y-6">
+            {stages.map((stage) => (
                <motion.div
                   key={stage.title}
-                  initial={{ opacity: 0, y: 16 }}
+                  initial={reduced ? false : { opacity: 0, y: 16 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
-                  transition={{ delay: i * 0.08 }}
-                  className="bg-muted/40 rounded-2xl p-6 md:p-8"
+                  transition={{ duration: 0.45, ease: 'easeOut' }}
+                  className={cn(
+                     'rounded-lg border border-[var(--sp-border)] bg-[var(--sp-bg-alt)] p-6 md:p-8',
+                     'shadow-[var(--shadow-card,0_2px_16px_rgba(15,81,50,0.06))]'
+                  )}
                >
-                  <h2 className="font-heading mb-1 text-xl font-bold md:text-2xl">
+                  <h2 className="font-display mb-1 text-xl font-bold text-[var(--sp-text)] md:text-2xl">
                      {stage.title}
                   </h2>
-                  <p className="text-muted-foreground mb-4 text-sm">
+                  <p className="mb-4 text-sm leading-relaxed text-[var(--sp-text-muted)]">
                      {stage.method}
                   </p>
 
@@ -133,18 +122,18 @@ export function AcademicsContent() {
                         {stage.streams.map((s) => (
                            <div
                               key={s.name}
-                              className="bg-background border-border rounded-xl border p-4"
+                              className="rounded-lg border border-[var(--sp-border)] bg-[var(--sp-bg)] p-4"
                            >
-                              <p className="text-navy dark:text-secondary mb-2 text-sm font-semibold">
+                              <p className="mb-2 text-sm font-semibold text-[var(--sp-primary)]">
                                  {s.name}
                               </p>
                               <ul className="space-y-1">
                                  {s.subjects.map((sub) => (
                                     <li
                                        key={sub}
-                                       className="text-muted-foreground flex items-center gap-1.5 text-xs"
+                                       className="flex items-center gap-1.5 text-xs text-[var(--sp-text-muted)]"
                                     >
-                                       <span className="bg-secondary h-1 w-1 rounded-full" />{' '}
+                                       <span className="h-1 w-1 shrink-0 rounded-full bg-[var(--sp-accent)]" />
                                        {sub}
                                     </li>
                                  ))}
@@ -157,9 +146,9 @@ export function AcademicsContent() {
                         {stage.subjects.map((sub) => (
                            <li
                               key={sub}
-                              className="text-muted-foreground flex items-center gap-2 text-sm"
+                              className="flex items-center gap-2 text-sm text-[var(--sp-text-muted)]"
                            >
-                              <span className="bg-secondary h-1.5 w-1.5 shrink-0 rounded-full" />
+                              <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-[var(--sp-accent)]" />
                               {sub}
                            </li>
                         ))}

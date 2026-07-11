@@ -1,17 +1,7 @@
-'use client'
-
-import dynamic from 'next/dynamic'
-
-const HeroSlider = dynamic(
-   () =>
-      import('@/components/public/home/HeroSlider').then((m) => m.HeroSlider),
-   {
-      loading: () => (
-         <div className="from-navy h-[92vh] max-h-[900px] min-h-[520px] animate-pulse bg-gradient-to-br to-[#2d5a9e]" />
-      ),
-      ssr: false,
-   }
-)
+// Direct import — no ssr:false. HeroSlider's 'use client' directive means Next.js
+// renders the first-slide HTML on the server (correct LCP content) and hydrates
+// Embla on the client. The min-h-[90vh] on the section prevents layout shift.
+import { HeroSlider } from '@/components/public/home/HeroSlider'
 
 export function HomeHero() {
    return <HeroSlider />

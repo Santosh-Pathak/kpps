@@ -3,100 +3,74 @@
 import Link from 'next/link'
 import { motion } from 'framer-motion'
 import { ArrowRight } from 'lucide-react'
-
-const stages = [
-   {
-      range: 'Pre-Primary',
-      grades: 'Nursery – KG',
-      description:
-         'Play-based learning, phonics, number sense, and foundational life skills.',
-      color: 'bg-amber-100 dark:bg-amber-950 border-amber-300 dark:border-amber-800',
-   },
-   {
-      range: 'Primary',
-      grades: 'Class I – V',
-      description:
-         'Strong foundations in Languages, Maths, EVS with activity-based teaching.',
-      color: 'bg-sky-100 dark:bg-sky-950 border-sky-300 dark:border-sky-800',
-   },
-   {
-      range: 'Middle School',
-      grades: 'Class VI – VIII',
-      description:
-         'Broadened curriculum with Science, Social Science, and project-based learning.',
-      color: 'bg-green-100 dark:bg-green-950 border-green-300 dark:border-green-800',
-   },
-   {
-      range: 'Secondary',
-      grades: 'Class IX – X',
-      description:
-         'CBSE Board preparation with comprehensive coaching and regular assessment.',
-      color: 'bg-violet-100 dark:bg-violet-950 border-violet-300 dark:border-violet-800',
-   },
-   {
-      range: 'Senior Secondary',
-      grades: 'Class XI – XII',
-      description:
-         'Science (Med/Non-Med), Commerce & Arts/Humanities streams with career guidance.',
-      color: 'bg-rose-100 dark:bg-rose-950 border-rose-300 dark:border-rose-800',
-   },
-]
+import { curriculumStages } from '@/lib/dummy-data'
+import { SectionHeading } from '@/components/public/shared/SectionHeading'
+import { WaveDivider } from '@/components/public/shared/WaveDivider'
+import { useReducedMotion } from '@/hooks/useReducedMotion'
+import { cn } from '@/lib/utils'
 
 export function CurriculumSnapshot() {
-   return (
-      <section className="section-pad bg-muted/40">
-         <div className="container-kpps">
-            <motion.div
-               initial={{ opacity: 0, y: 20 }}
-               whileInView={{ opacity: 1, y: 0 }}
-               viewport={{ once: true }}
-               className="mb-12 text-center"
-            >
-               <p className="text-secondary mb-2 text-sm font-semibold tracking-widest uppercase">
-                  Curriculum
-               </p>
-               <h2 className="font-heading mb-3 text-3xl font-bold md:text-4xl">
-                  Academics at a Glance
-               </h2>
-               <p className="text-muted-foreground mx-auto max-w-xl">
-                  From Nursery to Class XII — a seamless journey of learning and
-                  growth.
-               </p>
-            </motion.div>
+   const reduced = useReducedMotion()
 
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-5">
-               {stages.map((stage, i) => (
+   return (
+      <section className="relative pb-0 pt-16 bg-[var(--sp-bg-alt)] md:pt-24">
+         <div className="container-kpps">
+            <SectionHeading
+               eyebrow="Curriculum"
+               title="Academics at a Glance"
+               description="From Nursery to Class XII — a seamless journey of learning and growth."
+               className="mb-12"
+            />
+
+            {/* Horizontal scroll on mobile, grid on desktop */}
+            <div className="no-scrollbar -mx-4 flex snap-x snap-mandatory gap-4 overflow-x-auto px-4 pb-2 lg:mx-0 lg:grid lg:grid-cols-5 lg:overflow-visible lg:px-0 lg:pb-0">
+               {curriculumStages.map((stage, i) => (
                   <motion.div
                      key={stage.range}
-                     initial={{ opacity: 0, scale: 0.95 }}
-                     whileInView={{ opacity: 1, scale: 1 }}
+                     initial={reduced ? false : { opacity: 0, y: 16 }}
+                     whileInView={{ opacity: 1, y: 0 }}
                      viewport={{ once: true }}
-                     transition={{ delay: i * 0.08 }}
-                     className={`rounded-xl border p-5 ${stage.color}`}
+                     transition={{ duration: 0.45, ease: 'easeOut' }}
+                     whileHover={reduced ? {} : { y: -4, transition: { duration: 0.15, ease: 'easeOut' } }}
+                     className={cn(
+                        'group flex min-w-[220px] snap-start flex-col',
+                        'rounded-lg border border-[var(--sp-border)] bg-[var(--sp-bg)] p-6',
+                        'transition-shadow duration-200',
+                        'shadow-[var(--shadow-card,0_2px_16px_rgba(15,81,50,0.06))]',
+                        'hover:shadow-[var(--shadow-elevated,0_8px_32px_rgba(15,81,50,0.12))]',
+                        'lg:min-w-0'
+                     )}
                   >
-                     <p className="font-heading mb-0.5 text-base font-bold">
+                     <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-md bg-[var(--sp-accent-soft)] transition-colors group-hover:bg-[var(--sp-accent)]">
+                        <stage.icon className="h-5 w-5 text-[var(--sp-primary)] transition-colors group-hover:text-white" aria-hidden="true" />
+                     </div>
+                     <p className="font-display mb-0.5 text-base font-bold text-[var(--sp-text)]">
                         {stage.range}
                      </p>
-                     <p className="text-muted-foreground mb-2 text-xs font-semibold">
-                        {stage.grades}
-                     </p>
-                     <p className="text-muted-foreground text-xs leading-relaxed">
+                     <p className="mb-2 text-xs font-semibold text-[var(--sp-accent)]">{stage.grades}</p>
+                     <p className="flex-1 text-xs leading-relaxed text-[var(--sp-text-muted)]">
                         {stage.description}
                      </p>
+                     <Link
+                        href="/academics"
+                        className={cn(
+                           'mt-4 inline-flex items-center gap-1 text-xs font-semibold',
+                           'text-[var(--sp-primary)] transition-all group-hover:gap-2',
+                           'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)] rounded-sm'
+                        )}
+                     >
+                        Explore <ArrowRight className="h-3 w-3" aria-hidden="true" />
+                     </Link>
                   </motion.div>
                ))}
             </div>
-
-            <div className="mt-8 text-center">
-               <Link
-                  href="/academics"
-                  className="text-primary inline-flex items-center gap-2 font-semibold hover:underline"
-               >
-                  View Full Curriculum
-                  <ArrowRight className="h-4 w-4" />
-               </Link>
-            </div>
          </div>
+
+         <WaveDivider
+            className="mt-16"
+            fromColor="fill-[var(--sp-bg-alt)]"
+            toColor="fill-[var(--sp-bg)]"
+         />
       </section>
    )
 }
